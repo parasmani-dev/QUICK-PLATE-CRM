@@ -145,8 +145,8 @@
   box-shadow: 0 0 0 4px #f8f7f5;
   background-color: #f1f5f9;
   color: #94a3b8;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .track-step-circle.active {
@@ -155,13 +155,13 @@
 }
 
 .track-step-circle .material-symbols-outlined {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .track-step-circle.large {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 0 0 4px #f8f7f5;
 }
 
@@ -170,9 +170,10 @@
 }
 
 .track-step-label {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   color: #94a3b8;
+  text-align: center;
 }
 
 .track-step-label.active {

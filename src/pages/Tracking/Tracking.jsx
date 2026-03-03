@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -33,42 +33,156 @@ const Tracking = () => {
   
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [countdown, setCountdown] = useState(null);
+
+  const pollingRef = useRef(null);
+  const simIntervalRef = useRef(null);
 
   useEffect(() => {
-    const fetchOrder = async () => {
+    if (!orderId) return;
+
+    const fetchStatus = async () => {
       try {
+        let data = null;
+
         if (isMockMode) {
-          await new Promise(r => setTimeout(r, 600));
-          setOrder({ ...MOCK_ORDER, id: orderId || MOCK_ORDER.id });
+          data = {
+            orderId,
+            orderStatus: 'ASSIGNED',
+            agent: { name: 'Carlos M.' }
+          };
         } else {
-          try {
-            const res = await axios.get(`${API_BASE_URL}/orders/${orderId}`);
-            if (res.data) {
-               setOrder({
-                 id: res.data.id || orderId,
-                 status: res.data.Order_Status || 'PLACED',
-                 estimatedTime: res.data.Estimated_Time || MOCK_ORDER.estimatedTime,
-                 statusText: res.data.Status_Text || MOCK_ORDER.statusText,
-                 statusDesc: res.data.Status_Desc || MOCK_ORDER.statusDesc,
-                 agent: res.data.Agent || MOCK_ORDER.agent
-               });
-               setLoading(false);
-               return;
-            }
-          } catch(e) {
-            console.warn("Backend fetch failed, using mock data", e);
-          }
-          setOrder({ ...MOCK_ORDER, id: orderId || MOCK_ORDER.id });
+          const res = await axios.get(
+            `${API_BASE_URL}/services/apexrest/order/status/${orderId}`
+          );
+          data = res.data;
         }
-      } catch (err) {
-        console.error('Error fetching order:', err);
-        setOrder({ ...MOCK_ORDER, id: orderId || MOCK_ORDER.id });
-      } finally {
+
+        if (data) {
+          setOrder(prev => ({
+            ...(prev || {}),
+            id: data.orderId,
+            status: data.orderStatus,
+            agent: {
+              ...(prev?.agent || MOCK_ORDER.agent),
+              name: data.agent?.name || prev?.agent?.name || MOCK_ORDER.agent.name
+            },
+            estimatedTime: prev?.estimatedTime || MOCK_ORDER.estimatedTime,
+            statusText: prev?.statusText || MOCK_ORDER.statusText,
+            statusDesc: prev?.statusDesc || MOCK_ORDER.statusDesc
+          }));
+
+          if (
+            ['ASSIGNED','PICKED_UP','OUT_FOR_DELIVERY','DELIVERED','CANCELLED']
+              .includes(data.orderStatus)
+          ) {
+            if (pollingRef.current) {
+              clearInterval(pollingRef.current);
+            }
+          }
+        }
+
         setLoading(false);
+
+      } catch (err) {
+        console.error('Tracking error:', err);
       }
     };
-    fetchOrder();
+
+    // First fetch immediately
+    fetchStatus();
+
+    // Poll every 3 seconds
+    if (!isMockMode) {
+      pollingRef.current = setInterval(fetchStatus, 3000);
+    }
+
+    return () => clearInterval(pollingRef.current);
+
   }, [orderId]);
+
+  // Frontend simulation logic handling page refreshes
+  useEffect(() => {
+    if (!order) return;
+    
+    // Check if it's DELIVERED
+    if (order.status === 'DELIVERED') {
+      const redirectTimer = setTimeout(() => {
+        navigate('/orders');
+      }, 3000);
+      return () => clearTimeout(redirectTimer);
+    }
+
+    // Only simulate if the backend status has reached ASSIGNED
+    if (['CONFIRMED', 'PREPARING', 'CANCELLED'].includes(order.status)) {
+      return;
+    }
+
+    const storageKey = `TrackingSimStart_${orderId}`;
+    let startTime = parseInt(localStorage.getItem(storageKey), 10);
+    
+    // First time we hit ASSIGNED, record start time
+    if (!startTime && order.status === 'ASSIGNED') {
+      startTime = Date.now();
+      localStorage.setItem(storageKey, startTime.toString());
+    }
+
+    if (startTime) {
+      if (simIntervalRef.current) clearInterval(simIntervalRef.current);
+
+      const updateSimulation = () => {
+        const elapsed = Date.now() - startTime;
+        let nextStatus = '';
+        let timerValue = 0;
+        let sDesc = '';
+        let sText = '';
+
+        if (elapsed < 8000) {
+          nextStatus = 'ASSIGNED';
+          timerValue = Math.ceil((8000 - elapsed) / 1000);
+          sDesc = 'Agent has been assigned and is heading to the store.';
+        } else if (elapsed < 16000) {
+          nextStatus = 'PICKED_UP';
+          timerValue = Math.ceil((16000 - elapsed) / 1000);
+          sDesc = 'Agent has picked up your order.';
+        } else if (elapsed < 24000) {
+          nextStatus = 'OUT_FOR_DELIVERY';
+          timerValue = Math.ceil((24000 - elapsed) / 1000);
+          sDesc = 'Agent is on the way to your location!';
+        } else {
+          nextStatus = 'DELIVERED';
+          timerValue = 0;
+          sText = 'Delivered';
+          sDesc = 'Your order has been delivered! Enjoy your meal.';
+        }
+
+        setCountdown(timerValue);
+        
+        setOrder(prev => {
+          if (!prev) return prev;
+          if (prev.status !== nextStatus || prev.statusDesc !== sDesc || prev.statusText !== sText) {
+            return {
+              ...prev,
+              status: nextStatus,
+              statusDesc: sDesc || prev.statusDesc,
+              statusText: sText || prev.statusText
+            };
+          }
+          return prev;
+        });
+
+        if (nextStatus === 'DELIVERED') {
+          clearInterval(simIntervalRef.current);
+          localStorage.removeItem(storageKey);
+        }
+      };
+
+      updateSimulation(); // run instantly
+      simIntervalRef.current = setInterval(updateSimulation, 1000);
+
+      return () => clearInterval(simIntervalRef.current);
+    }
+  }, [order?.status, orderId, navigate]);
 
   if (loading || !order) {
     return (
@@ -78,8 +192,18 @@ const Tracking = () => {
     );
   }
 
-  const statuses = ['PLACED', 'KITCHEN', 'ON_THE_WAY', 'ARRIVED'];
-  const currentStatusIndex = statuses.indexOf(order.status) >= 0 ? statuses.indexOf(order.status) : 2;
+  const statuses = [
+    'CONFIRMED',
+    'PREPARING',
+    'ASSIGNED',
+    'PICKED_UP',
+    'OUT_FOR_DELIVERY',
+    'DELIVERED'
+  ];
+  const currentStatusIndex =
+    statuses.indexOf(order.status) >= 0
+      ? statuses.indexOf(order.status)
+      : 0;
 
   // Percentage for progress line: 0%, 33.3%, 66.6%, 100%
   const progressPercent = (currentStatusIndex / (statuses.length - 1)) * 100;
@@ -112,25 +236,61 @@ const Tracking = () => {
           />
 
           <div className="track-steps-row">
-            {/* Step 1: Placed */}
+            {/* Step 1: Confirmed */}
             <div className="track-step">
               <div className={`track-step-circle ${currentStatusIndex >= 0 ? 'active' : ''}`}>
                 <span className="material-symbols-outlined filled-icon">check</span>
               </div>
-              <span className={`track-step-label ${currentStatusIndex >= 0 ? 'active' : ''}`}>Placed</span>
+              <span className={`track-step-label ${currentStatusIndex >= 0 ? 'active' : ''}`}>Confirmed</span>
             </div>
 
-            {/* Step 2: Kitchen */}
+            {/* Step 2: Preparing */}
             <div className="track-step">
               <div className={`track-step-circle ${currentStatusIndex >= 1 ? 'active' : ''}`}>
                 <span className="material-symbols-outlined filled-icon">restaurant</span>
               </div>
-              <span className={`track-step-label ${currentStatusIndex >= 1 ? 'active' : ''}`}>Kitchen</span>
+              <span className={`track-step-label ${currentStatusIndex >= 1 ? 'active' : ''}`}>Preparing</span>
             </div>
 
-            {/* Step 3: On the way */}
+            {/* Step 3: Assigned */}
             <div className="track-step">
               {currentStatusIndex === 2 ? (
+                <motion.div 
+                  className="track-step-circle active pulse-shadow"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  <span className="material-symbols-outlined filled-icon">person</span>
+                </motion.div>
+              ) : (
+                <div className={`track-step-circle ${currentStatusIndex >= 2 ? 'active' : ''}`}>
+                  <span className="material-symbols-outlined filled-icon">person</span>
+                </div>
+              )}
+              <span className={`track-step-label ${currentStatusIndex === 2 ? 'active highlight' : (currentStatusIndex > 2 ? 'active' : '')}`}>Assigned</span>
+            </div>
+
+            {/* Step 4: Picked Up */}
+            <div className="track-step">
+              {currentStatusIndex === 3 ? (
+                <motion.div 
+                  className="track-step-circle active pulse-shadow"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                >
+                  <span className="material-symbols-outlined filled-icon">shopping_bag</span>
+                </motion.div>
+              ) : (
+                <div className={`track-step-circle ${currentStatusIndex >= 3 ? 'active' : ''}`}>
+                  <span className="material-symbols-outlined filled-icon">shopping_bag</span>
+                </div>
+              )}
+              <span className={`track-step-label ${currentStatusIndex === 3 ? 'active highlight' : (currentStatusIndex > 3 ? 'active' : '')}`}>Picked Up</span>
+            </div>
+
+            {/* Step 5: Out for Delivery */}
+            <div className="track-step">
+              {currentStatusIndex === 4 ? (
                 <motion.div 
                   className="track-step-circle active pulse-shadow large"
                   animate={{ scale: [1, 1.05, 1] }}
@@ -139,19 +299,19 @@ const Tracking = () => {
                   <span className="material-symbols-outlined filled-icon large-icon">moped</span>
                 </motion.div>
               ) : (
-                <div className={`track-step-circle ${currentStatusIndex >= 2 ? 'active' : ''}`}>
+                <div className={`track-step-circle ${currentStatusIndex >= 4 ? 'active' : ''}`}>
                    <span className="material-symbols-outlined filled-icon">moped</span>
                 </div>
               )}
-              <span className={`track-step-label ${currentStatusIndex === 2 ? 'active highlight' : (currentStatusIndex > 2 ? 'active' : '')}`}>On the way</span>
+              <span className={`track-step-label ${currentStatusIndex === 4 ? 'active highlight' : (currentStatusIndex > 4 ? 'active' : '')}`}>Out for Delivery</span>
             </div>
 
-            {/* Step 4: Arrived */}
+            {/* Step 6: Delivered */}
             <div className="track-step">
-              <div className={`track-step-circle ${currentStatusIndex >= 3 ? 'active' : 'inactive'}`}>
+              <div className={`track-step-circle ${currentStatusIndex >= 5 ? 'active' : 'inactive'}`}>
                 <span className="material-symbols-outlined">home</span>
               </div>
-              <span className={`track-step-label ${currentStatusIndex >= 3 ? 'active' : 'inactive'}`}>Arrived</span>
+              <span className={`track-step-label ${currentStatusIndex >= 5 ? 'active' : 'inactive'}`}>Delivered</span>
             </div>
           </div>
         </div>
@@ -159,7 +319,11 @@ const Tracking = () => {
 
       {/* ─── Status Info Box ─── */}
       <div className="track-status-box">
-        <h1 className="track-status-title">{order.statusText}</h1>
+        <h1 className="track-status-title">
+          {countdown !== null && countdown > 0
+            ? `Updating in 00:${String(countdown).padStart(2, '0')}`
+            : order.statusText}
+        </h1>
         <p className="track-status-desc">{order.statusDesc}</p>
       </div>
 
