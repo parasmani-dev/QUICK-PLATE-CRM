@@ -64,15 +64,22 @@ const Orders = () => {
           setOrders(MOCK_ORDERS);
         } else {
           try {
-            const res = await axios.get(`${API_BASE_URL}/orders`);
+            const storedUser = JSON.parse(localStorage.getItem('quickplate_user') || '{}');
+            const customerId = storedUser?.customerId;
+            if (!customerId) {
+              console.warn("No customer ID found. Cannot fetch orders.");
+              setOrders([]);
+              return;
+            }
+            const res = await axios.get(`${API_BASE_URL}/services/apexrest/customer/orders?customerId=${customerId}`);
             if (res.data && res.data.length > 0) {
               const mappedData = res.data.map(item => ({
                 id: item.Id || item.id || 'N/A',
-                restaurantName: item.Restaurant_Name__c || item.restaurantName || 'Quick Plate Order',
+                restaurantName: item.restaurantName || item.restaurantName || 'Quick Plate Order',
                 date: item.CreatedDate ? new Date(item.CreatedDate).toLocaleDateString() : item.date || 'Today',
-                total: item.Total_Amount__c || item.total || 0,
-                status: item.Order_Status__c || item.status || 'PLACED',
-                paymentStatus: item.Payment_Status__c || item.paymentStatus || '',
+                total: item.totalAmount || item.total || 0,
+                status: item.orderStatus || item.status || 'PLACED',
+                paymentStatus: item.paymentStatus || item.paymentStatus || '',
                 image: item.image || MOCK_ORDERS[0].image
               }));
               setOrders(mappedData);
@@ -100,7 +107,8 @@ const Orders = () => {
     navigate(`/tracking/${orderId}`);
   };
 
-  const activeOrders = orders.filter(order => order.status === 'ON_THE_WAY' || order.status === 'PLACED' || order.status === 'Payment Succeeded' || order.paymentStatus === 'Payment Succeeded');
+  const activeStatuses = ['ON_THE_WAY', 'PLACED', 'Payment Succeeded', 'CONFIRMED', 'PREPARING', 'ASSIGNED', 'PICKED_UP', 'OUT_FOR_DELIVERY'];
+  const activeOrders = orders.filter(order => activeStatuses.includes(order.status) || order.paymentStatus === 'Payment Succeeded');
   const refundProcessingOrders = orders.filter(order => order.status === 'REFUND_PROCESSING' || order.status === 'Refund Processing');
   const pastOrders = orders.filter(order => order.status === 'DELIVERED' || order.status === 'Delivered' || order.status === 'REFUNDED').slice(0, 8);
 
