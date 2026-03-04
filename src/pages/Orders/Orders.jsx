@@ -5,6 +5,29 @@ import useHaptic from '../../hooks/useHaptic';
 import '../Home/Home.css';
 import './Orders.css';
 
+import imgMorningBliss from '../../assets/images/MissMatched_Pics/Morning Bliss Bakery.avif';
+import imgNapoliWoodfired from '../../assets/images/MissMatched_Pics/Napoli Woodfired Pizza.avif';
+import imgSliceStone from '../../assets/images/MissMatched_Pics/Slice & Stone.avif';
+import imgSmashStack from '../../assets/images/MissMatched_Pics/Smash & Stack Burgers.avif';
+import imgSweetTooth from '../../assets/images/MissMatched_Pics/Sweet Tooth Confections.avif';
+import imgMeltdownGrill from '../../assets/images/MissMatched_Pics/The Meltdown Grill.avif';
+import imgTokyoNights from '../../assets/images/MissMatched_Pics/Tokyo Nights Rollhous.avif';
+import imgZenSushi from '../../assets/images/MissMatched_Pics/Zen Sushi Lounge.avif';
+import sushiPlatter from '../../assets/images/sushi-platter.png';
+
+const IMG = {
+  pasta:   'https://lh3.googleusercontent.com/aida-public/AB6AXuA7rRqrqQB8WlaPGEnNWpyhdP-PJiwWeP9SL--8b8mCFbqKRAp8ySZBcYOpWC_osbofXS3FhMghzEXj1WzAaysflWk79zTtw2OoN2T4ee7Pn11Vz1rp70xvF0DrnMANaRwY0eY_NkDxVjU6sWQZnxB2xST9n-j0F9KjFKd0_F3y0AAb6T6FGtcLSf9_fTcnrVht3s_SleVk3_bbyLHzFFgZfcamgnzB2vShoIxaY7XRlH3T-419ipyigS7bRFKP0kNFoG0G5NrpCN_K',
+  grill:   'https://lh3.googleusercontent.com/aida-public/AB6AXuDRVg4WHeLML4GR_FT_Qw2vnFTiy1T2ux5QaExfnIcN-9F5ma-BjKPAo0Qw7V_C2vQqA3UsAkfzKR5h7oAGr5lT4FN9Nui8lhC2Qal40qJvGanldNT3FvbzyVUMbAkvSOoDmsMfY0QHgkZOjWPpEdWXjwQxDotyzhlPzhpK9rB3i9gL076JH9wnsX5SHq_NS0dEWW7UIs5a4TIM86doVTMv5orv5tGlXzV0OZFq8laVjkiJW3WSdzMBtaCEgOMGTfabbkykSkvUp17R',
+  sushi:   sushiPlatter,
+  burger:  'https://lh3.googleusercontent.com/aida-public/AB6AXuBIVLq7cg2DsY4Dw1Dv-N3mH1ev7hGiwMSEtAkMb41GEGZ3NWK7evAuqaBMyAPxKkiWfWKvgy0nDn19gJTl36RHd5hphjpBZEHwnD5zk20Xz3OOqpcEORX-TSKWVxR8Sq03vPIHUrMBpMSwfx8YauQJCYaM9mvF_O0B0wiiuU6A1tz_aSdynsxPxodhs5brxxdbojLh_t-ic0gUZNfT-lRUTmhxPYdl_r1BhB55YUDUtCc1hXK1RrtsjFHPykKJvwn2ChzHDcNNp9Px',
+  dessert: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBOhl1yjOKt_cFiqW9w_vcZMp1dEUEqSkIF_1PZ2iIkZrAMPdZWmq5nS0UsAxyiyLEANe-rPR00vzNRPE7gtW5F_ZxagryLxi0ew6lKQX3HlNyzqu5iDJHCJ5K-lyvjvro7takNhJHZXCemHKBQWECAbNr0M7UqsYN56Y7IwMX3szaterAKcLL9gjnTAhk1Z5X2ZjsrOEQUEbt_qilhyYQDuwE2oaBRpNEGotfphSL4XSiYM5zKYG8L2ce2Prupm8XZIwamR4fa9m0p',
+  salad:   'https://lh3.googleusercontent.com/aida-public/AB6AXuBZH03LnZFjClUcB8auLGFe4iXGTZKPwtoc_7earTpfFLFpyJCZs0HnZvrIO9lRdlin_owGopgjo-eMqf8FxKWEdpRN11FShwLWF9Z7l7FV4qhusFk-YM9Ks3x-rR0l5pwRW6qQw9GcaCIK3IqOd9Nz0uQQzjdk9sAMRsSGOCpGXdvHjngM0ys6JcRfgZOyFuc2oxVMdee-vgSsOXFYq0vfqrhchkpb3dIRU1wD8DmpC7q6DlUQgQqjy4q2ZHuM5uOaqz6FmsWuOjuR',
+  masala:  'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=2571&auto=format&fit=crop',
+  tart:    'https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=2574&auto=format&fit=crop',
+  pastry:  'https://images.unsplash.com/photo-1509365465985-25d11c17e812?q=80&w=2630&auto=format&fit=crop',
+  cake:    'https://images.unsplash.com/photo-1621303837174-89787a7d4729?q=80&w=2536&auto=format&fit=crop',
+};
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const isMockMode = !API_BASE_URL;
 
@@ -48,6 +71,24 @@ const MOCK_ORDERS = [
   }
 ];
 
+const getMappedImage = (restaurantName) => {
+  if (!restaurantName) return MOCK_ORDERS[0].image;
+  if (restaurantName.includes("Morning Bliss")) return imgMorningBliss;
+  if (restaurantName.includes("Napoli Woodfired")) return imgNapoliWoodfired;
+  if (restaurantName.includes("Slice & Stone")) return imgSliceStone;
+  if (restaurantName.includes("Smash & Stack")) return imgSmashStack;
+  if (restaurantName.includes("Sweet Tooth")) return imgSweetTooth;
+  if (restaurantName.includes("Meltdown Grill")) return imgMeltdownGrill;
+  if (restaurantName.includes("Tokyo Nights")) return imgTokyoNights;
+  if (restaurantName.includes("Zen Sushi")) return imgZenSushi;
+  if (restaurantName.includes("Grill")) return IMG.grill;
+  if (restaurantName.includes("Masala")) return IMG.masala;
+  if (restaurantName.includes("Sakura") || restaurantName.includes("Omakase")) return IMG.sushi;
+  if (restaurantName.includes("Smokehouse")) return IMG.burger;
+  if (restaurantName.includes("Green & Grain")) return IMG.salad;
+  return MOCK_ORDERS[0].image;
+};
+
 const Orders = () => {
   const navigate = useNavigate();
   const { lightTap, mediumTap } = useHaptic();
@@ -73,15 +114,18 @@ const Orders = () => {
             }
             const res = await axios.get(`${API_BASE_URL}/services/apexrest/customer/orders?customerId=${customerId}`);
             if (res.data && res.data.length > 0) {
-              const mappedData = res.data.map(item => ({
-                id: item.Id || item.id || 'N/A',
-                restaurantName: item.restaurantName || item.restaurantName || 'Quick Plate Order',
-                date: item.CreatedDate ? new Date(item.CreatedDate).toLocaleDateString() : item.date || 'Today',
-                total: item.totalAmount || item.total || 0,
-                status: item.orderStatus || item.status || 'PLACED',
-                paymentStatus: item.paymentStatus || item.paymentStatus || '',
-                image: item.image || MOCK_ORDERS[0].image
-              }));
+              const mappedData = res.data.map(item => {
+                const restaurantName = item.restaurantName || item.restaurantName || 'Quick Plate Order';
+                return {
+                  id: item.Id || item.id || 'N/A',
+                  restaurantName: restaurantName,
+                  date: item.CreatedDate ? new Date(item.CreatedDate).toLocaleDateString() : item.date || 'Today',
+                  total: item.totalAmount || item.total || 0,
+                  status: item.orderStatus || item.status || 'PLACED',
+                  paymentStatus: item.paymentStatus || item.paymentStatus || '',
+                  image: item.image || getMappedImage(restaurantName)
+                };
+              });
               setOrders(mappedData);
             } else {
               setOrders([]);
@@ -151,9 +195,13 @@ const Orders = () => {
                           </div>
                           <p className="text-xs text-slate-500 mt-1">Order #{order.id} • {order.date}</p>
                           
-                          <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full bg-green-100 text-green-700 text-10 font-bold uppercase tracking-wider">
-                            <span className="material-symbols-outlined text-14 filled-icon">moped</span>
-                            {order.status === 'Payment Succeeded' || order.paymentStatus === 'Payment Succeeded' ? 'Payment Succeeded' : 'On the way'}
+                          <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full text-10 font-bold uppercase tracking-wider" style={{ backgroundColor: 'rgba(251,126,24,0.1)', color: 'var(--color-primary)' }}>
+                            <span className="material-symbols-outlined text-14 filled-icon">
+                              {['DELIVERED', 'Delivered'].includes(order.status) ? 'check_circle' : 'moped'}
+                            </span>
+                            {order.status === 'Payment Succeeded' || order.paymentStatus === 'Payment Succeeded' ? 'Payment Succeeded' : (
+                                ['CONFIRMED', 'PREPARING', 'ASSIGNED', 'PICKED_UP', 'OUT_FOR_DELIVERY', 'ON_THE_WAY', 'PLACED'].includes(order.status) ? order.status.replace(/_/g, ' ') : order.status
+                            )}
                           </div>
 
                           <div className="mt-3 flex gap-2">
@@ -263,6 +311,12 @@ const Orders = () => {
                                 <span className="text-sm font-bold">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
                               </div>
                               <p className="text-slate-500 text-xs mt-1">{order.date}</p>
+                              
+                              <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full text-10 font-bold uppercase tracking-wider" style={{ backgroundColor: 'rgba(251,126,24,0.1)', color: 'var(--color-primary)' }}>
+                                <span className="material-symbols-outlined text-14 filled-icon">check_circle</span>
+                                Delivered
+                              </div>
+                              
                               <div className="mt-3 flex gap-2">
                                 <button className="flex-1 bg-primary text-white text-xs font-bold py-2 rounded shadow-sm">Reorder</button>
                                 <button className="flex-1 border border-primary text-primary text-xs font-bold py-2 rounded">Raise Issue</button>
