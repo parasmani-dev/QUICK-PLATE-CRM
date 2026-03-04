@@ -9,6 +9,9 @@ import toast from 'react-hot-toast';
 import '../Home/Home.css';
 import './Discover.css';
 
+import sakuraDiscoverImg from '../../assets/images/Discover_Page_Pic/Sakura Omakase_Discover.webp';
+import smokeHouseDiscoverImg from '../../assets/images/Discover_Page_Pic/Smoke_House_Discover.webp';
+
 /* ─── Mock Data ─── */
 // Same fake URLs used in mockup
 const IMG = {
@@ -72,7 +75,24 @@ const Discover = () => {
     const loadRestaurants = async () => {
       try {
         const data = await fetchRestaurants();
-        setRestaurants(data);
+        const mappedData = data.map(r => {
+          let mappedImg = r.img;
+          if (r.name.includes("Sakura") || r.name.includes("Omakase")) mappedImg = sakuraDiscoverImg;
+          else if (r.name.includes("Smokehouse") || r.name.includes("Smoke House")) mappedImg = smokeHouseDiscoverImg;
+          else if (r.name.includes("Green & Grain")) mappedImg = IMG.salad;
+          else if (r.name.includes("Smash & Stack")) mappedImg = IMG.burger;
+          else if (r.name.includes("Morning Bliss")) mappedImg = IMG.pizza; 
+          else if (r.name.includes("Napoli")) mappedImg = IMG.pizza;
+          else if (r.name.includes("Slice & Stone")) mappedImg = IMG.pizza;
+          else if (r.name.includes("Meltdown")) mappedImg = IMG.burger;
+          else if (r.name.includes("Tokyo")) mappedImg = IMG.salad;
+          else if (r.name.includes("Zen Sushi")) mappedImg = IMG.salad;
+          else if (r.name.includes("Sweet Tooth")) mappedImg = IMG.friday;
+          else if (!mappedImg) mappedImg = IMG.salad;
+          
+          return { ...r, img: mappedImg };
+        });
+        setRestaurants(mappedData);
       } catch (err) {
         console.error('Failed to load restaurants:', err);
       }
@@ -94,12 +114,12 @@ const Discover = () => {
     }
   };
 
-  const newOnQuickPlate = restaurants.slice(2, 4); // Select real restaurants from payload
+  const newOnQuickPlate = restaurants.slice(0, 3); // Showing the first 3 restaurants
   
   const searchResults = restaurants.filter(
     (r) =>
       r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.cuisine.toLowerCase().includes(searchQuery.toLowerCase())
+      (r.cuisine && r.cuisine.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const displayList = searchQuery ? searchResults : newOnQuickPlate;
