@@ -22,6 +22,23 @@ const IMG = {
   taco: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDoUQTaRYRG-FcaW4HCCctHggtQMSwHCfRPGFWYKo3seavcLqlQk-DxuNwBeqpQ0DUBID1Fv5DlwROpMbFcAFHIjCIKMOMiCVDrZKfJJ8CuCA36wIOYfoWs3psbOG1qKJav8U90PKDwbmuw9Q8EoUUFAH9fp5CI8CumtMjd-eyVK-0a4AxrwsJlrcuc0o5gwH6TSHI2mt38Ku_7KNdmqR23cIMevBJOdddp9z9nkO-mgDUDJ-epYd2NzcoWiTrNewCkL3abQlgp69ET',
 };
 
+const RESTAURANT_METADATA = {
+  'The Luminary Grill': { cuisine: 'Modern American', price: '$$$', distance: '2.4 mi', time: '25-35 min', rating: '4.8', reviews: '1.2k', offer: '20% OFF YOUR ORDER', offerColor: 'orange' },
+  'Masala Tango': { cuisine: 'Indian Fusion', price: '$$', distance: '1.1 mi', time: '15-25 min', rating: '4.9', reviews: '800', offer: 'JUICY & SPICY SPECIAL', offerColor: 'orange' },
+  'Sakura Omakase': { cuisine: 'Japanese', price: '$$$$', distance: '3.2 mi', time: '30-40 min', rating: '4.9', reviews: '2.1k', offer: "CHEF'S TABLE SPECIAL", offerColor: 'orange' },
+  'Smokehouse BBQ Co.': { cuisine: 'BBQ & Grill', price: '$$', distance: '0.8 mi', time: '20-30 min', rating: '4.7', reviews: '650', offer: 'BUY 1 GET 1 FREE', offerColor: 'indigo' },
+  'Green & Grain': { cuisine: 'Mediterranean', price: '$$', distance: '1.5 mi', time: '15-20 min', rating: '4.8', reviews: '430', offer: 'NEW ON QUICK PLATE', offerColor: 'orange' },
+  'Morning Bliss Bakery': { cuisine: 'Bakery & Pastry', price: '$$', distance: '0.9 mi', time: '15-25 min', rating: '4.9', reviews: '1.5k', offer: 'FRESH OUT THE OVEN', offerColor: 'orange' },
+  'Sweet Tooth Confections': { cuisine: 'Desserts & Cakes', price: '$$$', distance: '1.2 mi', time: '20-30 min', rating: '4.8', reviews: '950', offer: 'BUY 1 GET 1 HALF OFF', offerColor: 'indigo' },
+  'Napoli Woodfired Pizza': { cuisine: 'Italian Pizza', price: '$$', distance: '1.8 mi', time: '25-40 min', rating: '4.7', reviews: '3.2k', offer: 'FREE GARLIC KNOTS', offerColor: 'orange' },
+  'Slice & Stone': { cuisine: 'Pizza', price: '$$$', distance: '2.1 mi', time: '30-45 min', rating: '4.9', reviews: '2.8k', offer: '20% OFF PREMIUM', offerColor: 'indigo' },
+  'Zen Sushi Lounge': { cuisine: 'Japanese Sushi', price: '$$$$', distance: '3.5 mi', time: '35-50 min', rating: '4.9', reviews: '1.1k', offer: 'COMPLIMENTARY MISO', offerColor: 'orange' },
+  'Tokyo Nights Rollhous': { cuisine: 'Japanese', price: '$$$', distance: '1.4 mi', time: '20-35 min', rating: '4.8', reviews: '890', offer: 'LATE NIGHT DEALS', offerColor: 'indigo' },
+  'Tokyo Nights Rollhouse': { cuisine: 'Japanese', price: '$$$', distance: '1.4 mi', time: '20-35 min', rating: '4.8', reviews: '890', offer: 'LATE NIGHT DEALS', offerColor: 'indigo' },
+  'Smash & Stack Burgers': { cuisine: 'American Burgers', price: '$$', distance: '0.6 mi', time: '15-20 min', rating: '4.6', reviews: '4.5k', offer: 'FREE FRIES W/ COMBO', offerColor: 'orange' },
+  'The Meltdown Grill': { cuisine: 'American BBQ', price: '$$$', distance: '1.9 mi', time: '25-30 min', rating: '4.8', reviews: '750', offer: 'DOUBLE CHEESE FREE', offerColor: 'indigo' }
+};
+
 const CATEGORIES = [
   { icon: 'local_fire_department', label: 'Trending' },
   { icon: 'potted_plant', label: 'Healthy' },
@@ -89,8 +106,23 @@ const Discover = () => {
           else if (r.name.includes("Zen Sushi")) mappedImg = IMG.salad;
           else if (r.name.includes("Sweet Tooth")) mappedImg = IMG.friday;
           else if (!mappedImg) mappedImg = IMG.salad;
-          
-          return { ...r, img: mappedImg };
+
+          const matchKey = Object.keys(RESTAURANT_METADATA).find(key => r.name.includes(key) || key.includes(r.name));
+          const meta = matchKey ? RESTAURANT_METADATA[matchKey] : {};
+
+          return {
+            id: r.id || r.Id,
+            name: r.name,
+            img: mappedImg,
+            cuisine: meta.cuisine || r.city || 'Local',
+            price: meta.price || '$$',
+            distance: meta.distance || '1.5 mi',
+            time: meta.time || (r.avgPrepTime ? `${r.avgPrepTime} min` : '20-30 min'),
+            rating: meta.rating || '4.8',
+            reviews: meta.reviews || '500+',
+            offer: meta.offer || 'FRESH SPECIAL',
+            offerColor: meta.offerColor || 'orange'
+          };
         });
         setRestaurants(mappedData);
       } catch (err) {
