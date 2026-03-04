@@ -53,8 +53,8 @@ const Orders = () => {
   const { lightTap, mediumTap } = useHaptic();
   
   const [orders, setOrders] = useState([]);
+  const [supportTickets, setSupportTickets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('Past Orders'); // Past Orders | Support Tickets
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -87,6 +87,8 @@ const Orders = () => {
       } catch (err) {
         console.error('Error fetching orders:', err);
       } finally {
+        const tickets = JSON.parse(localStorage.getItem('supportTickets') || '[]');
+        setSupportTickets(tickets);
         setLoading(false);
       }
     };
@@ -97,6 +99,10 @@ const Orders = () => {
     mediumTap();
     navigate(`/tracking/${orderId}`);
   };
+
+  const activeOrders = orders.filter(order => order.status === 'ON_THE_WAY' || order.status === 'PLACED' || order.status === 'Payment Succeeded' || order.paymentStatus === 'Payment Succeeded');
+  const refundProcessingOrders = orders.filter(order => order.status === 'REFUND_PROCESSING' || order.status === 'Refund Processing');
+  const pastOrders = orders.filter(order => order.status === 'DELIVERED' || order.status === 'Delivered' || order.status === 'REFUNDED').slice(0, 8);
 
   return (
     <div className="orders-layout">
@@ -113,24 +119,6 @@ const Orders = () => {
         </button>
       </header>
 
-      {/* ─── Tabs ─── */}
-      <div className="orders-tabs">
-        <div className="orders-tabs-container">
-          <button 
-            className={`orders-tab ${activeTab === 'Past Orders' ? 'active' : ''}`}
-            onClick={() => { lightTap(); setActiveTab('Past Orders'); }}
-          >
-            Past Orders
-          </button>
-          <button 
-            className={`orders-tab ${activeTab === 'Support Tickets' ? 'active' : ''}`}
-            onClick={() => { lightTap(); setActiveTab('Support Tickets'); }}
-          >
-            Support Tickets
-          </button>
-        </div>
-      </div>
-
       {/* ─── Main Content ─── */}
       <main className="orders-main">
         {loading ? (
@@ -138,143 +126,183 @@ const Orders = () => {
             <div className="orders-spinner" />
           </div>
         ) : (
-          <div className="orders-list">
-            {orders.map((order) => {
-              
-              /* Active Order State (e.g. Payment Succeeded / Placed / On the Way) */
-              if (order.status === 'ON_THE_WAY' || order.status === 'PLACED' || order.status === 'Payment Succeeded' || order.paymentStatus === 'Payment Succeeded') {
-                return (
-                  <div key={order.id} className="order-card p-4">
-                    <div className="order-flex-row gap-4">
-                      <div className="order-img-lg" style={{ backgroundImage: `url('${order.image}')` }} />
-                      <div className="flex-1">
-                        <div className="order-flex-between items-start">
-                          <h3 className="font-bold">{order.restaurantName}</h3>
-                          <span className="text-sm font-bold">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
-                        </div>
-                        <p className="text-xs text-slate-500 mt-1">Order #{order.id} • {order.date}</p>
-                        
-                        <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full bg-green-100 text-green-700 text-10 font-bold uppercase tracking-wider">
-                          <span className="material-symbols-outlined text-14 filled-icon">moped</span>
-                          {order.status === 'Payment Succeeded' || order.paymentStatus === 'Payment Succeeded' ? 'Payment Succeeded' : 'On the way'}
-                        </div>
-
-                        <div className="mt-3 flex gap-2">
-                          <button 
-                             className="flex-1 bg-primary text-white text-xs font-bold py-2 rounded shadow-sm"
-                             onClick={() => handleTrackOrder(order.id)}
-                          >
-                            Track Order
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-
-              /* Refund Processing Ticket */
-              if (order.status === 'REFUND_PROCESSING' || order.status === 'Refund Processing') {
-                return (
-                  <div key={order.id} className="order-card p-5">
-                    <div className="order-flex-between items-start mb-4">
+          <div className="orders-sections-container">
+            {/* CURRENT ORDER SECTION */}
+            {activeOrders.length > 0 && (
+              <div className="orders-section">
+                <h2 className="orders-section-title">Current Order</h2>
+                <div className="orders-list">
+                  {activeOrders.map((order) => (
+                    <div key={order.id} className="order-card p-4">
                       <div className="order-flex-row gap-4">
-                        <div className="order-img-md" style={{ backgroundImage: `url('${order.image}')` }} />
-                        <div>
-                          <h3 className="font-bold text-lg leading-tight">{order.restaurantName}</h3>
-                          <p className="text-slate-500 text-xs">{order.date}</p>
-                          <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full bg-blue-100 text-blue-700 text-10 font-bold uppercase tracking-wider">
-                            <span className="material-symbols-outlined text-14">autorenew</span>
-                            Refund Processing
+                        <div className="order-img-lg" style={{ backgroundImage: `url('${order.image}')` }} />
+                        <div className="flex-1">
+                          <div className="order-flex-between items-start">
+                            <h3 className="font-bold">{order.restaurantName}</h3>
+                            <span className="text-sm font-bold">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-1">Order #{order.id} • {order.date}</p>
+                          
+                          <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full bg-green-100 text-green-700 text-10 font-bold uppercase tracking-wider">
+                            <span className="material-symbols-outlined text-14 filled-icon">moped</span>
+                            {order.status === 'Payment Succeeded' || order.paymentStatus === 'Payment Succeeded' ? 'Payment Succeeded' : 'On the way'}
+                          </div>
+
+                          <div className="mt-3 flex gap-2">
+                            <button 
+                               className="flex-1 bg-primary text-white text-xs font-bold py-2 rounded shadow-sm"
+                               onClick={() => handleTrackOrder(order.id)}
+                            >
+                              Track Order
+                            </button>
                           </div>
                         </div>
                       </div>
-                      <span className="font-bold text-primary">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                    {order.ticket && (
-                    <div className="mt-4 pt-4 border-t border-slate-100">
-                      <p className="text-11 font-bold text-slate-400 uppercase tracking-widest mb-3">Ticket Status (Salesforce Sync)</p>
-                      
-                      <div className="ticket-timeline">
-                         <div className="ticket-axis" />
-                         
-                         <div className="ticket-point">
-                           <div className="ticket-dot bg-green-500" />
-                           <p className="text-sm font-semibold">Issue Reported</p>
-                           <p className="text-xs text-slate-500">{order.ticket.reportedAt}</p>
-                         </div>
-                         
-                         <div className="ticket-point">
-                           <div className="ticket-dot bg-primary" />
-                           <p className="text-sm font-semibold">Approved for Refund</p>
-                           <p className="text-xs text-slate-500">{order.ticket.approvedAt}</p>
-                         </div>
-
-                         <div className="ticket-point opacity-40">
-                           <div className="ticket-dot bg-slate-300" />
-                           <p className="text-sm font-semibold">Funds Released</p>
-                           <p className="text-xs text-slate-500">{order.ticket.releasedAt}</p>
-                         </div>
+            {/* SUPPORT TICKETS SECTION */}
+            {(supportTickets.length > 0 || refundProcessingOrders.length > 0) && (
+              <div className="orders-section mt-4">
+                <h2 className="orders-section-title">Active Tickets</h2>
+                <div className="orders-list">
+                  {supportTickets.map((ticket) => (
+                    <div key={ticket.id} className="order-card p-5">
+                      <div className="order-flex-between items-start">
+                        <div>
+                          <h3 className="font-bold text-lg leading-tight">{ticket.type ? ticket.restaurantName : `Issue with ${ticket.restaurantName}`}</h3>
+                          <p className="text-slate-500 text-xs mt-1">CASE-{ticket.id.replace('CASE-', '').replace('ORD-', '')}</p>
+                        </div>
+                        <span className="font-bold text-primary">${typeof ticket.total === 'number' ? ticket.total.toFixed(2) : ticket.total}</span>
                       </div>
-                    </div>
-                    )}
-                  </div>
-                );
-              }
-
-              /* Standard Delivered Order */
-              if (order.status === 'DELIVERED' || order.status === 'Delivered') {
-                return (
-                  <div key={order.id} className="order-card p-4">
-                    <div className="order-flex-row gap-4">
-                      <div className="order-img-lg" style={{ backgroundImage: `url('${order.image}')` }} />
-                      <div className="flex-1">
-                        <div className="order-flex-between items-start">
-                          <h3 className="font-bold">{order.restaurantName}</h3>
-                          <span className="text-sm font-bold">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
-                        </div>
-                        <p className="text-slate-500 text-xs mt-1">{order.date}</p>
-                        <div className="mt-3 flex gap-2">
-                          <button className="flex-1 bg-primary text-white text-xs font-bold py-2 rounded shadow-sm">Reorder</button>
-                          <button className="flex-1 border border-primary text-primary text-xs font-bold py-2 rounded">Raise Issue</button>
-                        </div>
+                      <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full bg-orange-100 text-orange-700 text-10 font-bold uppercase tracking-wider" style={{backgroundColor: 'rgba(251,126,24,0.1)', color: '#f97f1a'}}>
+                        <span className="material-symbols-outlined text-14">support_agent</span>
+                        {ticket.status || 'UNDER REVIEW'}
                       </div>
+                      <p className="text-sm mt-3 text-slate-600 border-t border-slate-100 pt-3">
+                         {ticket.desc ? ticket.desc : "Our agents are currently reviewing your request."}
+                      </p>
                     </div>
-                  </div>
-                );
-              }
-
-              /* Refunded Order */
-              if (order.status === 'REFUNDED') {
-                return (
-                  <div key={order.id} className="order-card p-4">
-                    <div className="order-flex-row gap-4">
-                      <div className="order-img-lg" style={{ backgroundImage: `url('${order.image}')` }} />
-                      <div className="flex-1">
-                        <div className="order-flex-between items-start">
-                          <h3 className="font-bold">{order.restaurantName}</h3>
-                          <span className="text-sm font-bold line-through text-slate-400">${order.total.toFixed(2)}</span>
+                  ))}
+                  
+                  {refundProcessingOrders.map((order) => (
+                    <div key={order.id} className="order-card p-5">
+                      <div className="order-flex-between items-start mb-4">
+                        <div className="order-flex-row gap-4">
+                          <div className="order-img-md" style={{ backgroundImage: `url('${order.image}')` }} />
+                          <div>
+                            <h3 className="font-bold text-lg leading-tight">{order.restaurantName}</h3>
+                            <p className="text-slate-500 text-xs">{order.date}</p>
+                            <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full bg-blue-100 text-blue-700 text-10 font-bold uppercase tracking-wider">
+                              <span className="material-symbols-outlined text-14">autorenew</span>
+                              Refund Processing
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-slate-500 text-xs mt-1">{order.date}</p>
+                        <span className="font-bold text-primary">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
+                      </div>
+
+                      {order.ticket && (
+                      <div className="mt-4 pt-4 border-t border-slate-100">
+                        <p className="text-11 font-bold text-slate-400 uppercase tracking-widest mb-3">Ticket Status</p>
                         
-                        <div className="mt-2 inline-flex items-center gap-1_5 px-2 py-0_5 rounded-full bg-slate-100 text-slate-600 text-10 font-bold uppercase tracking-wider">
-                          <span className="material-symbols-outlined text-14">check_circle</span>
-                          Refunded
-                        </div>
-                        
-                        <button className="mt-3 w-full border border-slate-200 text-slate-500 text-xs font-bold py-2 rounded flex items-center justify-center gap-2">
-                           <span className="material-symbols-outlined text-14">receipt_long</span>
-                           View Summary
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
+                        <div className="ticket-timeline">
+                           <div className="ticket-axis" />
+                           
+                           <div className="ticket-point">
+                             <div className="ticket-dot bg-green-500" />
+                             <p className="text-sm font-semibold">Issue Reported</p>
+                             <p className="text-xs text-slate-500">{order.ticket.reportedAt}</p>
+                           </div>
+                           
+                           <div className="ticket-point">
+                             <div className="ticket-dot bg-primary" />
+                             <p className="text-sm font-semibold">Approved for Refund</p>
+                             <p className="text-xs text-slate-500">{order.ticket.approvedAt}</p>
+                           </div>
 
-              return null;
-            })}
+                           <div className="ticket-point opacity-40">
+                             <div className="ticket-dot bg-slate-300" />
+                             <p className="text-sm font-semibold">Funds Released</p>
+                             <p className="text-xs text-slate-500">{order.ticket.releasedAt}</p>
+                           </div>
+                        </div>
+                      </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* PAST ORDERS SECTION (LIMIT 8) */}
+            {pastOrders.length > 0 && (
+              <div className="orders-section mt-4">
+                <h2 className="orders-section-title">Recent Orders</h2>
+                <div className="orders-list">
+                  {pastOrders.map((order) => {
+                    if (order.status === 'DELIVERED' || order.status === 'Delivered') {
+                      return (
+                        <div key={order.id} className="order-card p-4">
+                          <div className="order-flex-row gap-4">
+                            <div className="order-img-lg" style={{ backgroundImage: `url('${order.image}')` }} />
+                            <div className="flex-1">
+                              <div className="order-flex-between items-start">
+                                <h3 className="font-bold">{order.restaurantName}</h3>
+                                <span className="text-sm font-bold">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
+                              </div>
+                              <p className="text-slate-500 text-xs mt-1">{order.date}</p>
+                              <div className="mt-3 flex gap-2">
+                                <button className="flex-1 bg-primary text-white text-xs font-bold py-2 rounded shadow-sm">Reorder</button>
+                                <button className="flex-1 border border-primary text-primary text-xs font-bold py-2 rounded">Raise Issue</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    if (order.status === 'REFUNDED') {
+                      return (
+                        <div key={order.id} className="order-card p-4">
+                          <div className="order-flex-row gap-4">
+                            <div className="order-img-lg" style={{ backgroundImage: `url('${order.image}')` }} />
+                            <div className="flex-1">
+                              <div className="order-flex-between items-start">
+                                <h3 className="font-bold">{order.restaurantName}</h3>
+                                <span className="text-sm font-bold line-through text-slate-400">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
+                              </div>
+                              <p className="text-slate-500 text-xs mt-1">{order.date}</p>
+                              
+                              <div className="mt-2 inline-flex items-center gap-1_5 px-2 py-0_5 rounded-full bg-slate-100 text-slate-600 text-10 font-bold uppercase tracking-wider">
+                                <span className="material-symbols-outlined text-14">check_circle</span>
+                                Refunded
+                              </div>
+                              
+                              <button className="mt-3 w-full border border-slate-200 text-slate-500 text-xs font-bold py-2 rounded flex items-center justify-center gap-2">
+                                 <span className="material-symbols-outlined text-14">receipt_long</span>
+                                 View Summary
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* EMPTY STATE */}
+            {activeOrders.length === 0 && supportTickets.length === 0 && refundProcessingOrders.length === 0 && pastOrders.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#94a3b8' }}>
+                 <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#cbd5e1', marginBottom: '1rem' }}>receipt_long</span>
+                 <p style={{ fontWeight: 600 }}>No orders found.</p>
+              </div>
+            )}
           </div>
         )}
       </main>
@@ -308,3 +336,4 @@ const Orders = () => {
 };
 
 export default Orders;
+
