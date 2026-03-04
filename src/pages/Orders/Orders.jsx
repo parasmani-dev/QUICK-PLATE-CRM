@@ -242,7 +242,7 @@ const Orders = () => {
             {activeTab === 'tickets' && (
               <>
                 <div className="orders-section mt-4">
-                  <div className="flex justify-between items-center mb-4">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                     <h2 className="orders-title-premium" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       Active Tickets
                       <span className="tickets-badge-count">{supportTickets.length + refundProcessingOrders.length}</span>
