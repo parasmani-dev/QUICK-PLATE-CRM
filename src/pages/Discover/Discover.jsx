@@ -114,7 +114,15 @@ const Discover = () => {
     }
   };
 
-  const newOnQuickPlate = restaurants.slice(0, 3); // Showing the first 3 restaurants
+  const newOnQuickPlate = restaurants.filter(r => 
+    r.name.includes("Sakura") || r.name.includes("Omakase") ||
+    r.name.includes("Smokehouse") || r.name.includes("Smoke House") ||
+    r.name.includes("Smash & Stack")
+  ).slice(0, 3);
+  
+  if (newOnQuickPlate.length < 3 && restaurants.length > 0) {
+    newOnQuickPlate.push(...restaurants.filter(r => !newOnQuickPlate.includes(r)).slice(0, 3 - newOnQuickPlate.length));
+  }
   
   const searchResults = restaurants.filter(
     (r) =>
