@@ -157,19 +157,24 @@ const Orders = () => {
   const pastOrders = orders.filter(order => order.status === 'DELIVERED' || order.status === 'Delivered' || order.status === 'REFUNDED').slice(0, 8);
 
   return (
-    <div className="orders-layout">
+    <div className="orders-layout bg-background-light dark:bg-background-dark">
       {/* ─── Header ─── */}
-      <header className="orders-header">
-        <div className="orders-header-left">
-          <button className="orders-back-btn" onClick={() => { lightTap(); navigate(-1); }}>
-            <span className="material-symbols-outlined text-primary">arrow_back_ios</span>
-          </button>
-          <h1 className="orders-h1">My Orders</h1>
+      <header className="sticky top-0 z-20 bg-background-light/90 dark:bg-slate-900/90 backdrop-blur-md px-6 py-5 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <span onClick={() => { lightTap(); navigate(-1); }} className="material-symbols-outlined text-primary cursor-pointer font-bold">arrow_back_ios</span>
+          <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white">Order History</h1>
         </div>
-        <button className="orders-search-btn" onClick={lightTap}>
-          <span className="material-symbols-outlined text-primary">search</span>
+        <button className="bg-primary/5 p-2.5 rounded-full text-primary hover:bg-primary/10 transition-colors" onClick={lightTap}>
+          <span className="material-symbols-outlined text-[22px]">search</span>
         </button>
       </header>
+
+      <div className="px-6 mb-2 mt-2">
+        <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl">
+          <button className="flex-1 bg-primary text-white py-2.5 rounded-xl text-sm font-bold shadow-md shadow-primary/20 transition-all">Past Orders</button>
+          <button className="flex-1 text-slate-500 dark:text-slate-400 py-2.5 text-sm font-semibold transition-all">Support Tickets</button>
+        </div>
+      </div>
 
       {/* ─── Main Content ─── */}
       <main className="orders-main">
@@ -181,181 +186,184 @@ const Orders = () => {
           <div className="orders-sections-container">
             {/* CURRENT ORDER SECTION */}
             {activeOrders.length > 0 && (
-              <div className="orders-section">
-                <h2 className="orders-section-title">Current Order</h2>
-                <div className="orders-list">
+              <section className="mb-8">
+                <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Current Order</h2>
+                <div className="flex flex-col gap-4">
                   {activeOrders.map((order) => (
-                    <div key={order.id} className="order-card p-4">
-                      <div className="order-flex-row gap-4">
-                        <div className="order-img-lg" style={{ backgroundImage: `url('${order.image}')` }} />
+                    <div key={order.id} className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-orange-100 dark:border-slate-800" style={{ boxShadow: '0 10px 30px -10px rgba(0,0,0,0.05)' }}>
+                      <div className="flex gap-4 mb-4">
+                        <div className="w-20 h-20 rounded-full bg-center bg-cover shrink-0" style={{ backgroundImage: `url('${order.image}')`, boxShadow: '0 10px 30px -10px rgba(0,0,0,0.05)' }} />
                         <div className="flex-1">
-                          <div className="order-flex-between items-start">
-                            <h3 className="font-bold">{order.restaurantName}</h3>
-                            <span className="text-sm font-bold">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-bold text-slate-800 dark:text-white">{order.restaurantName}</h3>
+                            <span className="font-bold text-slate-900 dark:text-white">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
                           </div>
-                          <p className="text-xs text-slate-500 mt-1">Order #{order.id} • {order.date}</p>
+                          <p className="text-slate-400 text-xs mt-1">Order #{order.id} • {order.date}</p>
                           
-                          <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full text-10 font-bold uppercase tracking-wider" style={{ backgroundColor: 'rgba(251,126,24,0.1)', color: 'var(--color-primary)' }}>
-                            <span className="material-symbols-outlined text-14 filled-icon">
-                              {['DELIVERED', 'Delivered'].includes(order.status) ? 'check_circle' : 'moped'}
+                          <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400 text-[10px] font-bold uppercase tracking-wider">
+                            <span className="material-symbols-outlined text-[14px]">
+                              {['DELIVERED', 'Delivered'].includes(order.status) ? 'check_circle' : 'local_shipping'}
                             </span>
                             {order.status === 'Payment Succeeded' || order.paymentStatus === 'Payment Succeeded' ? 'Payment Succeeded' : (
                                 ['CONFIRMED', 'PREPARING', 'ASSIGNED', 'PICKED_UP', 'OUT_FOR_DELIVERY', 'ON_THE_WAY', 'PLACED'].includes(order.status) ? order.status.replace(/_/g, ' ') : order.status
                             )}
                           </div>
-
-                          <div className="mt-3 flex gap-2">
-                            <button 
-                               className="flex-1 bg-primary text-white text-xs font-bold py-2 rounded shadow-sm"
-                               onClick={() => handleTrackOrder(order.id)}
-                            >
-                              Track Order
-                            </button>
-                          </div>
                         </div>
                       </div>
+                      
+                      <button 
+                         className="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-500/25 hover:opacity-90 transition-opacity"
+                         onClick={() => handleTrackOrder(order.id)}
+                      >
+                        Track Order
+                      </button>
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
-            {/* SUPPORT TICKETS SECTION */}
-            {(supportTickets.length > 0 || refundProcessingOrders.length > 0) && (
-              <div className="orders-section mt-4">
-                <h2 className="orders-section-title">Active Tickets</h2>
-                <div className="orders-list">
+            {/* PAST & SUPPORT TICKETS SECTION */}
+            {(pastOrders.length > 0 || supportTickets.length > 0 || refundProcessingOrders.length > 0) && (
+              <section className="space-y-4">
+                <h2 className="text-lg font-bold text-slate-800 dark:text-white">Recent Orders</h2>
+                <div className="space-y-4">
+                  {/* Local Support Tickets */}
                   {supportTickets.map((ticket) => (
-                    <div key={ticket.id} className="order-card p-5">
-                      <div className="order-flex-between items-start">
+                    <div key={ticket.id} className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-50 dark:border-slate-800" style={{ boxShadow: '0 10px 30px -10px rgba(0,0,0,0.05)' }}>
+                      <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="font-bold text-lg leading-tight">{ticket.type ? ticket.restaurantName : `Issue with ${ticket.restaurantName}`}</h3>
-                          <p className="text-slate-500 text-xs mt-1">CASE-{ticket.id.replace('CASE-', '').replace('ORD-', '')}</p>
+                          <h3 className="font-bold text-slate-800 dark:text-white">{ticket.type ? ticket.restaurantName : `Issue with ${ticket.restaurantName}`}</h3>
+                          <p className="text-slate-400 text-xs mt-1">CASE-{ticket.id.replace('CASE-', '').replace('ORD-', '')}</p>
                         </div>
-                        <span className="font-bold text-primary">${typeof ticket.total === 'number' ? ticket.total.toFixed(2) : ticket.total}</span>
+                        <span className="font-bold text-slate-900 dark:text-white">${typeof ticket.total === 'number' ? ticket.total.toFixed(2) : ticket.total}</span>
                       </div>
-                      <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full bg-orange-100 text-orange-700 text-10 font-bold uppercase tracking-wider" style={{backgroundColor: 'rgba(251,126,24,0.1)', color: '#f97f1a'}}>
-                        <span className="material-symbols-outlined text-14">support_agent</span>
+                      <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400 text-[10px] font-bold uppercase tracking-wider">
+                        <span className="material-symbols-outlined text-[14px]">support_agent</span>
                         {ticket.status || 'UNDER REVIEW'}
                       </div>
-                      <p className="text-sm mt-3 text-slate-600 border-t border-slate-100 pt-3">
+                      <p className="text-sm mt-3 text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-3">
                          {ticket.desc ? ticket.desc : "Our agents are currently reviewing your request."}
                       </p>
                     </div>
                   ))}
-                  
+
+                  {/* Refund Processing Orders */}
                   {refundProcessingOrders.map((order) => (
-                    <div key={order.id} className="order-card p-5">
-                      <div className="order-flex-between items-start mb-4">
-                        <div className="order-flex-row gap-4">
-                          <div className="order-img-md" style={{ backgroundImage: `url('${order.image}')` }} />
+                    <div key={order.id} className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-50 dark:border-slate-800 overflow-hidden relative" style={{ boxShadow: '0 10px 30px -10px rgba(0,0,0,0.05)' }}>
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="flex gap-4">
+                          <div className="w-16 h-16 rounded-full bg-center bg-cover shrink-0" style={{ backgroundImage: `url('${order.image}')` }} />
                           <div>
-                            <h3 className="font-bold text-lg leading-tight">{order.restaurantName}</h3>
-                            <p className="text-slate-500 text-xs">{order.date}</p>
-                            <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full bg-blue-100 text-blue-700 text-10 font-bold uppercase tracking-wider">
-                              <span className="material-symbols-outlined text-14">autorenew</span>
+                            <h3 className="font-bold text-slate-800 dark:text-white">{order.restaurantName}</h3>
+                            <p className="text-slate-400 text-xs mt-0.5">#{order.id} • {order.date}</p>
+                            <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300 text-[10px] font-bold uppercase tracking-wider">
+                              <span className="material-symbols-outlined text-[14px] animate-spin" style={{ animationDuration: '3s' }}>sync</span>
                               Refund Processing
                             </div>
                           </div>
                         </div>
                         <span className="font-bold text-primary">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
                       </div>
+                      
+                      {/* Ticket Status UI */}
+                      <div className="pt-5 border-t border-slate-50 dark:border-slate-800">
+                        <div className="flex items-center gap-2 mb-5">
+                          <span className="material-symbols-outlined text-[18px] text-slate-400">cloud_done</span>
+                          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Ticket Status (Salesforce Sync)</p>
+                        </div>
+                        <div className="relative space-y-7 ml-1">
+                          <div className="absolute left-[11px] top-2 bottom-2 w-0.5" style={{ background: 'linear-gradient(to bottom, #22c55e 0%, #fb7e18 50%, #e2e8f0 100%)' }}></div>
+                          
+                          <div className="relative pl-10">
+                            <div className="absolute left-0 top-0.5 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-4 border-white dark:border-slate-900 shadow-sm z-10">
+                              <span className="material-symbols-outlined text-white text-[12px] font-bold">check</span>
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Issue Reported</p>
+                              <p className="text-[11px] text-slate-400">{order.ticket?.reportedAt || 'Today, 7:15 PM'}</p>
+                            </div>
+                          </div>
 
-                      {order.ticket && (
-                      <div className="mt-4 pt-4 border-t border-slate-100">
-                        <p className="text-11 font-bold text-slate-400 uppercase tracking-widest mb-3">Ticket Status</p>
-                        
-                        <div className="ticket-timeline">
-                           <div className="ticket-axis" />
-                           
-                           <div className="ticket-point">
-                             <div className="ticket-dot bg-green-500" />
-                             <p className="text-sm font-semibold">Issue Reported</p>
-                             <p className="text-xs text-slate-500">{order.ticket.reportedAt}</p>
-                           </div>
-                           
-                           <div className="ticket-point">
-                             <div className="ticket-dot bg-primary" />
-                             <p className="text-sm font-semibold">Approved for Refund</p>
-                             <p className="text-xs text-slate-500">{order.ticket.approvedAt}</p>
-                           </div>
+                          <div className="relative pl-10">
+                            <div className="absolute left-0 top-0.5 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-4 border-white dark:border-slate-900 shadow-sm z-10">
+                              <span className="material-symbols-outlined text-white text-[12px] font-bold">verified</span>
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Approved for Refund</p>
+                              <p className="text-[11px] text-slate-400">{order.ticket?.approvedAt || 'Today, 8:45 PM'}</p>
+                            </div>
+                          </div>
 
-                           <div className="ticket-point opacity-40">
-                             <div className="ticket-dot bg-slate-300" />
-                             <p className="text-sm font-semibold">Funds Released</p>
-                             <p className="text-xs text-slate-500">{order.ticket.releasedAt}</p>
-                           </div>
+                          <div className="relative pl-10">
+                            <div className="absolute left-0 top-0.5 w-6 h-6 bg-slate-200 dark:bg-slate-800 rounded-full flex items-center justify-center border-4 border-white dark:border-slate-900 z-10">
+                              <span className="material-symbols-outlined text-slate-400 dark:text-slate-600 text-[12px]">account_balance_wallet</span>
+                            </div>
+                            <div className="opacity-50">
+                              <p className="text-sm font-bold text-slate-500">Funds Released</p>
+                              <p className="text-[11px] text-slate-400">{order.ticket?.releasedAt || 'Estimated 3-5 days'}</p>
+                            </div>
+                          </div>
+
                         </div>
                       </div>
-                      )}
                     </div>
                   ))}
-                </div>
-              </div>
-            )}
 
-            {/* PAST ORDERS SECTION (LIMIT 8) */}
-            {pastOrders.length > 0 && (
-              <div className="orders-section mt-4">
-                <h2 className="orders-section-title">Recent Orders</h2>
-                <div className="orders-list">
+                  {/* Delivered Past Orders */}
                   {pastOrders.map((order) => {
                     if (order.status === 'DELIVERED' || order.status === 'Delivered') {
                       return (
-                        <div key={order.id} className="order-card p-4">
-                          <div className="order-flex-row gap-4">
-                            <div className="order-img-lg" style={{ backgroundImage: `url('${order.image}')` }} />
+                        <div key={order.id} className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-50 dark:border-slate-800" style={{ boxShadow: '0 10px 30px -10px rgba(0,0,0,0.05)' }}>
+                          <div className="flex gap-4 mb-4">
+                            <div className="w-20 h-20 rounded-full bg-center bg-cover shrink-0" style={{ backgroundImage: `url('${order.image}')` }} />
                             <div className="flex-1">
-                              <div className="order-flex-between items-start">
-                                <h3 className="font-bold">{order.restaurantName}</h3>
-                                <span className="text-sm font-bold">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
+                              <div className="flex justify-between items-start">
+                                <h3 className="font-bold text-slate-800 dark:text-white">{order.restaurantName}</h3>
+                                <span className="font-bold text-slate-900 dark:text-white">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
                               </div>
-                              <p className="text-slate-500 text-xs mt-1">{order.date}</p>
-                              
-                              <div className="mt-2 inline-flex items-center gap-1_5 px-2_5 py-0_5 rounded-full text-10 font-bold uppercase tracking-wider" style={{ backgroundColor: 'rgba(251,126,24,0.1)', color: 'var(--color-primary)' }}>
-                                <span className="material-symbols-outlined text-14 filled-icon">check_circle</span>
+                              <p className="text-slate-400 text-xs mt-1">{order.date}</p>
+                              <div className="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                                <span className="material-symbols-outlined text-[14px] text-green-500">check_circle</span>
                                 Delivered
                               </div>
-                              
-                              <div className="mt-3 flex gap-2">
-                                <button className="flex-1 bg-primary text-white text-xs font-bold py-2 rounded shadow-sm">Reorder</button>
-                                <button className="flex-1 border border-primary text-primary text-xs font-bold py-2 rounded">Raise Issue</button>
-                              </div>
                             </div>
+                          </div>
+                          <div className="flex gap-3">
+                            <button className="flex-1 bg-primary text-white text-xs font-bold py-3 rounded-xl shadow-sm hover:opacity-90">Reorder</button>
+                            <button className="flex-1 border border-primary/20 text-primary text-xs font-bold py-3 rounded-xl hover:bg-primary/5">Raise Issue</button>
                           </div>
                         </div>
                       );
                     }
                     if (order.status === 'REFUNDED') {
                       return (
-                        <div key={order.id} className="order-card p-4">
-                          <div className="order-flex-row gap-4">
-                            <div className="order-img-lg" style={{ backgroundImage: `url('${order.image}')` }} />
+                        <div key={order.id} className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-50 dark:border-slate-800" style={{ boxShadow: '0 10px 30px -10px rgba(0,0,0,0.05)' }}>
+                          <div className="flex gap-4 mb-4">
+                            <div className="w-20 h-20 rounded-full bg-center bg-cover shrink-0" style={{ backgroundImage: `url('${order.image}')` }} />
                             <div className="flex-1">
-                              <div className="order-flex-between items-start">
-                                <h3 className="font-bold">{order.restaurantName}</h3>
-                                <span className="text-sm font-bold line-through text-slate-400">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
+                              <div className="flex justify-between items-start">
+                                <h3 className="font-bold text-slate-800 dark:text-white">{order.restaurantName}</h3>
+                                <span className="font-bold line-through text-slate-400">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total}</span>
                               </div>
-                              <p className="text-slate-500 text-xs mt-1">{order.date}</p>
-                              
-                              <div className="mt-2 inline-flex items-center gap-1_5 px-2 py-0_5 rounded-full bg-slate-100 text-slate-600 text-10 font-bold uppercase tracking-wider">
-                                <span className="material-symbols-outlined text-14">check_circle</span>
+                              <p className="text-slate-400 text-xs mt-1">{order.date}</p>
+                              <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                                <span className="material-symbols-outlined text-[14px]">check_circle</span>
                                 Refunded
                               </div>
-                              
-                              <button className="mt-3 w-full border border-slate-200 text-slate-500 text-xs font-bold py-2 rounded flex items-center justify-center gap-2">
-                                 <span className="material-symbols-outlined text-14">receipt_long</span>
-                                 View Summary
-                              </button>
                             </div>
                           </div>
+                          <button className="mt-1 w-full border border-slate-200 dark:border-slate-800 text-slate-500 text-xs font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800">
+                             <span className="material-symbols-outlined text-[14px]">receipt_long</span>
+                             View Summary
+                          </button>
                         </div>
                       );
                     }
                     return null;
                   })}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* EMPTY STATE */}
