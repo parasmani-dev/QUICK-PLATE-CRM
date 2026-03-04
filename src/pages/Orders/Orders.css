@@ -516,3 +516,49 @@
 .timeline-step-premium.opacity-50 {
   opacity: 0.5;
 }
+
+/* ─── Tickets Specific Styles ─── */
+.tickets-badge-count {
+  background-color: rgba(251, 126, 24, 0.1);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 700;
+}
+
+.tickets-new-issue-btn {
+  background-color: rgba(251, 126, 24, 0.1);
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.375rem 0.875rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tickets-new-issue-btn:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.past-ticket-img {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  background-position: center;
+  background-size: cover;
+  flex-shrink: 0;
+  filter: grayscale(100%);
+}
+
+.past-ticket-status {
+  background-color: #f1f5f9;
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+}

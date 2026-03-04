@@ -93,9 +93,15 @@ const Orders = () => {
   const navigate = useNavigate();
   const { lightTap, mediumTap } = useHaptic();
   
+  const [activeTab, setActiveTab] = useState('orders');
   const [orders, setOrders] = useState([]);
   const [supportTickets, setSupportTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const mockPastTickets = [
+    { id: 'CS-291', restaurantName: 'Sakura Omakase', price: 248.0, status: 'RESOLVED', image: IMG.sushi },
+    { id: 'CS-104', restaurantName: 'Smokehouse BBQ Co.', price: 65.0, status: 'CLOSED', image: IMG.burger }
+  ];
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -164,7 +170,7 @@ const Orders = () => {
           <button className="orders-back-btn" onClick={() => { lightTap(); navigate(-1); }}>
             <span className="material-symbols-outlined text-primary font-bold">arrow_back_ios</span>
           </button>
-          <h1>Order History</h1>
+          <h1>{activeTab === 'orders' ? 'Order History' : 'Support Tickets'}</h1>
         </div>
         <button className="orders-search-btn" onClick={lightTap}>
           <span className="material-symbols-outlined text-primary text-[22px]">search</span>
@@ -173,8 +179,14 @@ const Orders = () => {
 
       <div className="orders-toggle-wrap">
         <div className="orders-toggle-box">
-          <button className="orders-toggle-btn active">Past Orders</button>
-          <button className="orders-toggle-btn">Support Tickets</button>
+          <button 
+             className={`orders-toggle-btn ${activeTab === 'orders' ? 'active' : ''}`}
+             onClick={() => { lightTap(); setActiveTab('orders'); }}
+          >Past Orders</button>
+          <button 
+             className={`orders-toggle-btn ${activeTab === 'tickets' ? 'active' : ''}`}
+             onClick={() => { lightTap(); setActiveTab('tickets'); }}
+          >Support Tickets</button>
         </div>
       </div>
 
@@ -187,7 +199,7 @@ const Orders = () => {
         ) : (
           <div className="orders-sections-container">
             {/* CURRENT ORDER SECTION */}
-            {activeOrders.length > 0 && (
+            {activeTab === 'orders' && activeOrders.length > 0 && (
               <div className="orders-section">
                 <h2 className="orders-title-premium">Current Order</h2>
                 <div className="orders-list">
@@ -224,11 +236,28 @@ const Orders = () => {
               </div>
             )}
 
+            {/* ======================= */}
             {/* SUPPORT TICKETS SECTION */}
-            {(supportTickets.length > 0 || refundProcessingOrders.length > 0) && (
-              <div className="orders-section mt-4">
-                <h2 className="orders-title-premium">Active Tickets</h2>
-                <div className="orders-list">
+            {/* ======================= */}
+            {activeTab === 'tickets' && (
+              <>
+                <div className="orders-section mt-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="orders-title-premium" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      Active Tickets
+                      <span className="tickets-badge-count">{supportTickets.length + refundProcessingOrders.length}</span>
+                    </h2>
+                    <button className="tickets-new-issue-btn" onClick={() => { mediumTap(); navigate('/support'); }}>
+                      New Issue
+                    </button>
+                  </div>
+                  
+                  {supportTickets.length === 0 && refundProcessingOrders.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94a3b8' }}>
+                       <p style={{ fontWeight: 600 }}>No active tickets.</p>
+                    </div>
+                  ) : (
+                    <div className="orders-list">
                   {supportTickets.map((ticket) => (
                     <div key={ticket.id} className="orders-card-premium">
                       <div className="order-flex-between items-start">
@@ -304,11 +333,34 @@ const Orders = () => {
                     </div>
                   ))}
                 </div>
+                )}
               </div>
-            )}
+
+              <div className="orders-section mt-6">
+                <h2 className="orders-title-premium mb-4">Past Tickets</h2>
+                <div className="orders-list">
+                  {mockPastTickets.map((tc, idx) => (
+                    <div key={idx} className="orders-card-premium" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem' }}>
+                      <div className="past-ticket-img" style={{ backgroundImage: `url('${tc.image}')` }} />
+                      <div className="flex-1">
+                        <div className="order-flex-between items-center">
+                          <h3 className="font-bold text-sm" style={{ color: '#1e293b' }}>{tc.restaurantName}</h3>
+                          <span className="text-xs font-bold text-slate-500">${tc.price.toFixed(2)}</span>
+                        </div>
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Case #{tc.id}</span>
+                          <span className="past-ticket-status">{tc.status}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
             {/* PAST ORDERS SECTION (LIMIT 8) */}
-            {pastOrders.length > 0 && (
+            {activeTab === 'orders' && pastOrders.length > 0 && (
               <div className="orders-section mt-4">
                 <h2 className="orders-title-premium">Recent Orders</h2>
                 <div className="orders-list">
@@ -371,7 +423,7 @@ const Orders = () => {
             )}
 
             {/* EMPTY STATE */}
-            {activeOrders.length === 0 && supportTickets.length === 0 && refundProcessingOrders.length === 0 && pastOrders.length === 0 && (
+            {activeTab === 'orders' && activeOrders.length === 0 && pastOrders.length === 0 && (
               <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#94a3b8' }}>
                  <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#cbd5e1', marginBottom: '1rem' }}>receipt_long</span>
                  <p style={{ fontWeight: 600 }}>No orders found.</p>
