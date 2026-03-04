@@ -386,7 +386,7 @@ const Orders = () => {
                           
                           <div className="mt-3 flex gap-2">
                             <button className="btn-reorder-premium">Reorder</button>
-                            <button className="btn-raise-premium">Raise Issue</button>
+                            <button className="btn-raise-premium" onClick={() => { mediumTap(); navigate('/support'); }}>Raise Issue</button>
                           </div>
                         </div>
                       );
