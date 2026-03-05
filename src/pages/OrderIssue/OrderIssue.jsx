@@ -118,13 +118,12 @@ const OrderIssue = () => {
       setIsSubmitting(false);
       // Save to local storage to mock backend & UI
       const newTicket = {
-        id: caseId,
-        type: 'Order Issues',
-        restaurantName: selectedOrder?.name || 'Quick Plate Order',
-        date: new Date().toISOString(),
-        status: 'UNDER REVIEW',
-        desc: desc,
-        total: null
+        ticketId: caseId,
+        ticketNumber: caseId,
+        issueType: 'Order Issue: ' + (selectedOrder?.name || 'Quick Plate Order'),
+        createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+        ticketStatus: 'NEW',
+        description: desc
       };
       
       const existing = JSON.parse(localStorage.getItem('supportTickets') || '[]');

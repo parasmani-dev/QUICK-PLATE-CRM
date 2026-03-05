@@ -94,13 +94,12 @@ const RaiseRefund = () => {
       setIsSubmitting(false);
       // Save to local storage to mock backend & UI
       const newTicket = {
-        id: caseId,
-        type: 'Raise Refund',
-        restaurantName: selectedOrder ? selectedOrder.name : `Order #${formData.orderId}`,
-        date: new Date().toISOString(),
-        status: 'UNDER REVIEW',
-        desc: desc,
-        total: selectedOrder ? parseFloat(selectedOrder.total) : 42.50
+        ticketId: caseId,
+        ticketNumber: caseId,
+        issueType: 'Refund Request: ' + (selectedOrder ? selectedOrder.name : `Order #${formData.orderId}`),
+        createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+        ticketStatus: 'NEW',
+        description: desc
       };
       
       const existing = JSON.parse(localStorage.getItem('supportTickets') || '[]');

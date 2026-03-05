@@ -77,13 +77,12 @@ const PaymentIssue = () => {
     } finally {
       setIsSubmitting(false);
       const newTicket = {
-        id: caseId,
-        type: 'Payment Issue',
-        restaurantName: selectedOrder?.name || 'Quick Plate Order',
-        date: new Date().toISOString(),
-        status: 'UNDER REVIEW',
-        desc: desc,
-        total: selectedOrder?.total || 42.50
+        ticketId: caseId,
+        ticketNumber: caseId,
+        issueType: 'Payment Issue: ' + (selectedOrder?.name || 'Quick Plate Order'),
+        createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+        ticketStatus: 'NEW',
+        description: desc
       };
       
       const existing = JSON.parse(localStorage.getItem('supportTickets') || '[]');

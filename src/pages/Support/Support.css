@@ -300,16 +300,46 @@
   text-transform: uppercase;
 }
 
+.status-new {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.status-progress {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.status-waiting {
+  background-color: rgba(249, 127, 26, 0.1);
+  color: #f97f1a;
+  border: 1px solid rgba(249, 127, 26, 0.2);
+}
+
 .status-review {
   background-color: rgba(251, 191, 36, 0.1);
   color: #d97706;
   border: 1px solid rgba(251, 191, 36, 0.2);
 }
 
-.status-finance {
-  background-color: rgba(99, 102, 241, 0.1);
-  color: #4f46e5;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+.status-resolved {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-closed {
+  background-color: rgba(100, 116, 139, 0.1);
+  color: #475569;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.status-default {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #64748b;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .support-ticket-update {
@@ -367,4 +397,33 @@
 }
 .support-ticket-desc .success-text {
   color: #059669;
+}
+
+/* Empty and Loading States */
+.support-loading {
+  text-align: center;
+  padding: 2rem 0;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.support-empty {
+  padding: 1.5rem;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 1rem;
+}
+
+.support-empty .material-symbols-outlined {
+  font-size: 32px;
+  color: #cbd5e1;
+  margin-bottom: 0.5rem;
+}
+
+.support-empty p {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0;
 }
