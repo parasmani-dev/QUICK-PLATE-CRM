@@ -187,8 +187,8 @@ const Orders = () => {
              onClick={() => { lightTap(); setActiveTab('orders'); }}
           >Past Orders</button>
           <button 
-             className="orders-toggle-btn"
-             onClick={() => { mediumTap(); navigate('/support'); }}
+             className={`orders-toggle-btn ${activeTab === 'tickets' ? 'active' : ''}`}
+             onClick={() => { lightTap(); setActiveTab('tickets'); }}
           >Support Tickets</button>
         </div>
       </div>
@@ -261,24 +261,36 @@ const Orders = () => {
                     </div>
                   ) : (
                     <div className="orders-list">
-                  {supportTickets.map((ticket) => (
-                    <div key={ticket.id} className="orders-card-premium">
-                      <div className="order-flex-between items-start">
-                        <div>
-                          <h3 className="font-bold text-lg leading-tight" style={{ color: '#1e293b' }}>{ticket.type ? ticket.restaurantName : `Issue with ${ticket.restaurantName}`}</h3>
-                          <p className="text-slate-500 text-xs mt-1">CASE-{ticket.id.replace('CASE-', '').replace('ORD-', '')}</p>
+                  {supportTickets.map((ticket) => {
+                    const tid = ticket.ticketId || ticket.ticketNumber || ticket.id || '';
+                    const issueType = ticket.issueType || ticket.type || '';
+                    const statusVal = ticket.ticketStatus || ticket.Ticket_Status || ticket.status || 'UNDER REVIEW';
+                    const descTxt = ticket.description || ticket.desc || "Our agents are currently reviewing your request.";
+                    const totalVal = ticket.total || null;
+
+                    return (
+                      <div key={tid} className="orders-card-premium">
+                        <div className="order-flex-between items-start">
+                          <div>
+                            <h3 className="font-bold text-lg leading-tight" style={{ color: '#1e293b' }}>
+                              {issueType ? (ticket.restaurantName || issueType) : `Issue with ${ticket.restaurantName}`}
+                            </h3>
+                            <p className="text-slate-500 text-xs mt-1">
+                              CASE-{String(tid).replace('CASE-', '').replace('ORD-', '')}
+                            </p>
+                          </div>
+                          {totalVal && <span className="font-bold text-primary">${typeof totalVal === 'number' ? totalVal.toFixed(2) : totalVal}</span>}
                         </div>
-                        <span className="font-bold text-primary">${typeof ticket.total === 'number' ? ticket.total.toFixed(2) : ticket.total}</span>
+                        <div className="status-pill status-orange">
+                          <span className="material-symbols-outlined text-14">support_agent</span>
+                          {statusVal}
+                        </div>
+                        <p className="text-sm mt-3 text-slate-600 border-t border-slate-100 pt-3">
+                           {descTxt}
+                        </p>
                       </div>
-                      <div className="status-pill status-orange">
-                        <span className="material-symbols-outlined text-14">support_agent</span>
-                        {ticket.status || 'UNDER REVIEW'}
-                      </div>
-                      <p className="text-sm mt-3 text-slate-600 border-t border-slate-100 pt-3">
-                         {ticket.desc ? ticket.desc : "Our agents are currently reviewing your request."}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                   
                   {refundProcessingOrders.map((order) => (
                     <div key={order.id} className="orders-card-premium">
