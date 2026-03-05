@@ -28,6 +28,24 @@ const getStatusTag = (status) => {
 
 };
 
+const STATUS_SEQUENCE = [
+  'NEW',
+  'IN_PROGRESS',
+  'WAITING_FOR_CUSTOMER',
+  'WAITING_FOR_INTERNAL_TEAM',
+  'RESOLVED',
+  'CLOSED'
+];
+
+const STATUS_LABELS = {
+  'NEW': 'Issue Reported',
+  'IN_PROGRESS': 'In Progress',
+  'WAITING_FOR_CUSTOMER': 'Waiting For Customer',
+  'WAITING_FOR_INTERNAL_TEAM': 'Waiting For Internal Team',
+  'RESOLVED': 'Resolved',
+  'CLOSED': 'Closed'
+};
+
 const Support = () => {
 
   const navigate = useNavigate();
@@ -225,55 +243,65 @@ const Support = () => {
 
                   <div
                     className="support-ticket-card"
-                    key={ticket.ticketId}
+                    key={ticket.ticketId || ticket.id}
                   >
-
-                    <div className="support-ticket-accent"></div>
-
-                    <div className="support-ticket-header">
-
-                      <div>
-
-                        <div className="support-ticket-meta">
-
-                          <span className="support-ticket-id">
-                            {ticket.ticketNumber || ticket.ticketId}
-                          </span>
-
-                          <span className="support-ticket-time">
-                            • {ticket.createdAt || 'Recently'}
-                          </span>
-
-                        </div>
-
-                        <h4 className="support-ticket-title">
-                          {ticket.issueType}
-                        </h4>
-
-                      </div>
-
-                      <span
-                        className={`support-ticket-status ${statusTag.class}`}
-                      >
-                        {statusTag.label}
-                      </span>
-
+                    <div className="st-info-wrapper">
+                       {ticket.image ? (
+                          <img src={ticket.image} alt="Restaurant" className="st-restaurant-img" />
+                       ) : (
+                          <div className="st-icon-circle">
+                            <span className="material-symbols-outlined">restaurant</span>
+                          </div>
+                       )}
+                       <div className="st-details">
+                         <div className="st-title-row">
+                           <h4 className="st-title">{ticket.restaurantName || ticket.issueType}</h4>
+                           {ticket.total && <span className="st-price">${Number(ticket.total).toFixed(2)}</span>}
+                         </div>
+                         <p className="st-meta">{ticket.ticketNumber || ticket.ticketId} • {ticket.createdAt || 'Recently'}</p>
+                         <div className={`st-badge ${statusTag.class}`}>
+                            <span className="material-symbols-outlined" style={{ fontSize: '12px', marginRight: '4px' }}>sync</span>
+                            {statusTag.label.toUpperCase()}
+                         </div>
+                       </div>
                     </div>
 
-                    <div className="support-ticket-update">
+                    <div className="st-divider"></div>
+                    <p className="st-timeline-title">TICKET STATUS (SALESFORCE SYNC)</p>
 
-                      <div className="support-pulse-dot-container">
-                        <span className="support-pulse-ring"></span>
-                        <span className="support-pulse-dot"></span>
-                      </div>
+                    <div className="st-timeline">
+                       {STATUS_SEQUENCE.map((statusKey, index) => {
+                          const currentIndex = STATUS_SEQUENCE.indexOf(ticket.ticketStatus || 'NEW');
+                          const isCompleted = index < currentIndex;
+                          const isCurrent = index === currentIndex;
+                          const isFuture = index > currentIndex;
 
-                      <p className="support-ticket-desc">
-                        {ticket.description ||
-                          "Support team is reviewing your request."}
-                      </p>
-
+                          return (
+                            <div className="st-timeline-step" key={statusKey}>
+                               <div className="st-timeline-indicator">
+                                  <div className={`st-dot ${isCompleted ? 'completed' : isCurrent ? 'current' : 'future'}`}>
+                                    {isCurrent && <div className="st-dot-glow"></div>}
+                                  </div>
+                                  {index < STATUS_SEQUENCE.length - 1 && (
+                                    <div className={`st-line ${isCompleted ? 'completed' : 'future'}`}></div>
+                                  )}
+                               </div>
+                               <div className="st-timeline-content">
+                                  <h5 className={`st-step-title ${isFuture ? 'future' : ''}`}>
+                                    {STATUS_LABELS[statusKey]}
+                                  </h5>
+                                  {isCurrent ? (
+                                    <p className="st-step-time">{ticket.createdAt || 'Just now'}</p>
+                                  ) : isCompleted ? (
+                                    <p className="st-step-time">Completed</p>
+                                  ) : (
+                                    <p className="st-step-time">Pending</p>
+                                  )}
+                               </div>
+                            </div>
+                          )
+                       })}
                     </div>
-
                   </div>
 
                 );

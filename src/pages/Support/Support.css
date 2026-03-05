@@ -231,73 +231,192 @@
   position: relative;
   overflow: hidden;
   border-radius: 1rem;
-  background-color: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  padding: 1rem 1rem 1rem 1.25rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  padding: 1.25rem;
 }
 
-.support-ticket-accent {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: rgba(249, 127, 26, 0.8);
+.st-info-wrapper {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-.support-ticket-header {
+.st-icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.st-icon-circle .material-symbols-outlined {
+  font-size: 28px;
+}
+
+.st-restaurant-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.st-details {
+  flex: 1;
+}
+
+.st-title-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.125rem;
 }
 
-.support-ticket-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
+.st-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
 }
 
-.support-ticket-id {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.05em;
-  color: #94a3b8;
-  text-transform: uppercase;
-  background-color: #f1f5f9;
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
+.st-price {
+  font-size: 16px;
+  font-weight: 800;
+  color: #f97f1a;
 }
 
-.support-ticket-time {
-  font-size: 10px;
-  color: #94a3b8;
+.st-meta {
+  margin: 0 0 0.5rem 0;
+  font-size: 12px;
+  color: #64748b;
   font-weight: 500;
 }
 
-.support-ticket-title {
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.375;
-  color: #0f172a;
-  margin: 0;
-}
-
-.support-ticket-status {
+.st-badge {
   display: inline-flex;
   align-items: center;
   border-radius: 9999px;
   padding: 0.25rem 0.625rem;
   font-size: 10px;
   font-weight: 800;
-  text-align: center;
-  line-height: 1.25;
-  backdrop-filter: blur(4px);
-  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Timeline Status Sync Layout */
+.st-divider {
+  height: 1px;
+  background-color: #f1f5f9;
+  margin: 1rem -1.25rem 1.25rem;
+}
+
+.st-timeline-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.1em;
+  margin: 0 0 1rem 0;
+}
+
+.st-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.st-timeline-step {
+  display: flex;
+  gap: 1rem;
+}
+
+.st-timeline-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 12px;
+}
+
+.st-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.st-dot.completed {
+  background-color: #10b981; /* Green */
+}
+
+.st-dot.current {
+  background-color: #f97f1a; /* Orange */
+}
+
+.st-dot.future {
+  background-color: #e2e8f0; /* Grey */
+}
+
+.st-dot-glow {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background-color: rgba(249, 127, 26, 0.3);
+  border-radius: 50%;
+  animation: st-pulse 2s infinite ease-in-out;
+}
+
+@keyframes st-pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.4); opacity: 0.2; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.st-line {
+  width: 2px;
+  flex: 1;
+  margin: 4px 0;
+  min-height: 24px;
+}
+
+.st-line.completed {
+  background-color: #10b981;
+}
+
+.st-line.future {
+  background-color: #e2e8f0;
+}
+
+.st-timeline-content {
+  padding-bottom: 0.5rem;
+  flex: 1;
+}
+
+.st-timeline-step:last-child .st-timeline-content {
+  padding-bottom: 0;
+}
+
+.st-step-title {
+  margin: -2px 0 0.125rem 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.st-step-title.future {
+  color: #94a3b8;
+}
+
+.st-step-time {
+  margin: 0;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 .status-new {
@@ -342,62 +461,7 @@
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-.support-ticket-update {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #f1f5f9;
-}
 
-.support-pulse-dot-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding-left: 2px;
-}
-
-.support-pulse-dot {
-  position: relative;
-  display: inline-flex;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #10b981;
-}
-
-.support-pulse-ring {
-  position: absolute;
-  left: -1px;
-  top: -1px;
-  display: inline-flex;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: rgba(16, 185, 129, 0.3);
-  animation: support-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes support-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(1.5); }
-}
-
-.support-ticket-desc {
-  font-size: 12px;
-  color: #475569;
-  font-weight: 500;
-  line-height: 1.25;
-  margin: 0;
-}
-
-.support-ticket-desc span {
-  color: #0f172a;
-  font-weight: 700;
-}
-.support-ticket-desc .success-text {
-  color: #059669;
-}
 
 /* Empty and Loading States */
 .support-loading {
