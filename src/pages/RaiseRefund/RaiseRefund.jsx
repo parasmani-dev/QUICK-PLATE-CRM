@@ -72,9 +72,10 @@ const RaiseRefund = () => {
         const payload = {
           customerId: storedUser.customerId,
           orderId: selectedOrder?.id,
-          type: 'Raise Refund',
+          type: 'Refund Request',
           description: desc,
-          restaurantName: selectedOrder?.name
+          restaurantName: selectedOrder?.name,
+          reason: formData.reason
         };
         
         await axios.post(`${API_BASE_URL}/services/apexrest/case/create`, payload, {

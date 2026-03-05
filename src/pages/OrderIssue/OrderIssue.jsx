@@ -98,7 +98,8 @@ const OrderIssue = () => {
           orderId: selectedOrder?.id,
           type: 'Order Issue',
           description: desc,
-          restaurantName: selectedOrder?.name
+          restaurantName: selectedOrder?.name,
+          reason: selectedIssueData?.title
         };
         
         await axios.post(`${API_BASE_URL}/services/apexrest/case/create`, payload, {
