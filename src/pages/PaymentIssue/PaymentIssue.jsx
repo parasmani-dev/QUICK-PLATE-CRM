@@ -50,6 +50,8 @@ const PaymentIssue = () => {
     const selectedIssueData = issues.find(i => i.id === selectedIssue);
     const desc = selectedIssueData ? `${selectedIssueData.title}` : 'Payment problem reported';
     
+    const caseId = `CASE-${Math.floor(Math.random() * 90000) + 10000}`;
+    
     try {
       if (!isMockMode) {
         const storedUser = getStoredUser() || {};
@@ -59,7 +61,8 @@ const PaymentIssue = () => {
           type: 'Payment Issue',
           description: desc,
           restaurantName: selectedOrder?.name,
-          reason: selectedIssueData?.title
+          reason: selectedIssueData?.title,
+          caseId: caseId
         };
         
         await axios.post(`${API_BASE_URL}/services/apexrest/case/create`, payload, {
@@ -74,7 +77,7 @@ const PaymentIssue = () => {
     } finally {
       setIsSubmitting(false);
       const newTicket = {
-        id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
+        id: caseId,
         type: 'Payment Issue',
         restaurantName: selectedOrder?.name || 'Quick Plate Order',
         date: new Date().toISOString(),

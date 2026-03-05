@@ -90,6 +90,8 @@ const OrderIssue = () => {
     const selectedIssueData = ISSUE_CATEGORIES.find(i => i.id === selectedIssue);
     const desc = selectedIssueData ? `${selectedIssueData.title} reported` : 'Issue reported with order';
     
+    const caseId = `CASE-${Math.floor(Math.random() * 90000) + 10000}`;
+    
     try {
       if (!isMockMode) {
         const storedUser = getStoredUser() || {};
@@ -99,7 +101,8 @@ const OrderIssue = () => {
           type: 'Order Issue',
           description: desc,
           restaurantName: selectedOrder?.name,
-          reason: selectedIssueData?.title
+          reason: selectedIssueData?.title,
+          caseId: caseId
         };
         
         await axios.post(`${API_BASE_URL}/services/apexrest/case/create`, payload, {
@@ -115,7 +118,7 @@ const OrderIssue = () => {
       setIsSubmitting(false);
       // Save to local storage to mock backend & UI
       const newTicket = {
-        id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
+        id: caseId,
         type: 'Order Issues',
         restaurantName: selectedOrder?.name || 'Quick Plate Order',
         date: new Date().toISOString(),

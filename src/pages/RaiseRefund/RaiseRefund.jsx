@@ -66,6 +66,8 @@ const RaiseRefund = () => {
     const selectedOrder = recentOrders.find(o => o.id === formData.orderId);
     const desc = `${formData.reason} - ${formData.description || 'Refund requested for order'}`;
     
+    const caseId = `CASE-${Math.floor(Math.random() * 90000) + 10000}`;
+    
     try {
       if (!isMockMode) {
         const storedUser = getStoredUser() || {};
@@ -75,7 +77,8 @@ const RaiseRefund = () => {
           type: 'Refund Request',
           description: desc,
           restaurantName: selectedOrder?.name,
-          reason: formData.reason
+          reason: formData.reason,
+          caseId: caseId
         };
         
         await axios.post(`${API_BASE_URL}/services/apexrest/case/create`, payload, {
@@ -91,7 +94,7 @@ const RaiseRefund = () => {
       setIsSubmitting(false);
       // Save to local storage to mock backend & UI
       const newTicket = {
-        id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
+        id: caseId,
         type: 'Raise Refund',
         restaurantName: selectedOrder ? selectedOrder.name : `Order #${formData.orderId}`,
         date: new Date().toISOString(),
