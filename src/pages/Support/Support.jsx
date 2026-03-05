@@ -15,6 +15,7 @@ const isMockMode = !API_BASE_URL;
 
 const getStatusTag = (status) => {
 
+  const normalizedStatus = status || 'NEW';
   const map = {
     NEW: { label: "New", class: "status-new" },
     IN_PROGRESS: { label: "In Progress", class: "status-progress" },
@@ -24,7 +25,7 @@ const getStatusTag = (status) => {
     CLOSED: { label: "Closed", class: "status-closed" }
   };
 
-  return map[status] || { label: status, class: "status-default" };
+  return map[normalizedStatus] || { label: normalizedStatus, class: "status-default" };
 
 };
 
