@@ -236,9 +236,14 @@ const Support = () => {
             ) : tickets.length > 0 ? (
 
               tickets.map(ticket => {
+                
+                // Securely extract and normalize backend status
+                const rawStatus = ticket.ticketStatus || ticket.Ticket_Status || ticket.status || 'NEW';
+                const formattedStatus = String(rawStatus).toUpperCase().replace(/\s+/g, '_');
+                const validStatus = STATUS_SEQUENCE.includes(formattedStatus) ? formattedStatus : 'NEW';
 
                 const statusTag =
-                  getStatusTag(ticket.ticketStatus);
+                  getStatusTag(validStatus);
 
                 return (
 
@@ -272,7 +277,7 @@ const Support = () => {
 
                     <div className="st-timeline">
                        {STATUS_SEQUENCE.map((statusKey, index) => {
-                          const currentIndex = STATUS_SEQUENCE.indexOf(ticket.ticketStatus || 'NEW');
+                          const currentIndex = STATUS_SEQUENCE.indexOf(validStatus);
                           const isCompleted = index < currentIndex;
                           const isCurrent = index === currentIndex;
                           const isFuture = index > currentIndex;

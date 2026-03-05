@@ -187,8 +187,8 @@ const Orders = () => {
              onClick={() => { lightTap(); setActiveTab('orders'); }}
           >Past Orders</button>
           <button 
-             className={`orders-toggle-btn ${activeTab === 'tickets' ? 'active' : ''}`}
-             onClick={() => { lightTap(); setActiveTab('tickets'); }}
+             className="orders-toggle-btn"
+             onClick={() => { mediumTap(); navigate('/support'); }}
           >Support Tickets</button>
         </div>
       </div>
