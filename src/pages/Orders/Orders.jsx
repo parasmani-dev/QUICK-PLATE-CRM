@@ -109,6 +109,7 @@ const Orders = () => {
         if (isMockMode) {
           await new Promise(r => setTimeout(r, 600));
           setOrders(MOCK_ORDERS);
+          localStorage.setItem('quickplate_orders', JSON.stringify(MOCK_ORDERS));
         } else {
           try {
             const storedUser = JSON.parse(localStorage.getItem('quickplate_user') || '{}');
@@ -133,8 +134,10 @@ const Orders = () => {
                 };
               });
               setOrders(mappedData);
+              localStorage.setItem('quickplate_orders', JSON.stringify(mappedData));
             } else {
               setOrders([]);
+              localStorage.setItem('quickplate_orders', JSON.stringify([]));
             }
           } catch(e) {
             console.warn("Backend fetch failed", e);

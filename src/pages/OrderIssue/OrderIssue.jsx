@@ -31,11 +31,33 @@ const ISSUE_CATEGORIES = [
   { id: 'late_delivery', icon: 'schedule', title: 'Late Delivery', desc: 'Order arrived significantly after ETA' },
 ];
 
+const getInitialOrders = () => {
+  try {
+    const stored = localStorage.getItem('quickplate_orders');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const past = parsed.filter(order => order.status === 'DELIVERED' || order.status === 'Delivered' || order.status === 'REFUNDED').slice(0, 8);
+      if (past.length > 0) {
+        return past.map(o => ({
+          id: o.id,
+          name: o.restaurantName,
+          meta: `${o.status === 'REFUNDED' || o.status === 'Refunded' ? 'Refunded' : 'Delivered'} • ${o.date}`,
+          image: o.image
+        }));
+      }
+    }
+  } catch (e) {
+    console.warn("Failed to parse orders from localStorage", e);
+  }
+  return [];
+};
+
 const OrderIssue = () => {
   const navigate = useNavigate();
   const { lightTap, mediumTap } = useHaptic();
   
-  const [selectedOrder, setSelectedOrder] = useState(MOCK_ORDERS[0]);
+  const [recentOrders] = useState(getInitialOrders);
+  const [selectedOrder, setSelectedOrder] = useState(recentOrders[0]);
   const [selectedIssue, setSelectedIssue] = useState('wrong_order');
 
   const handleBack = () => {
@@ -61,7 +83,7 @@ const OrderIssue = () => {
     const newTicket = {
       id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
       type: 'Order Issues',
-      restaurantName: selectedOrder.name,
+      restaurantName: selectedOrder?.name || 'Quick Plate Order',
       date: new Date().toISOString(),
       status: 'UNDER REVIEW',
       desc: selectedIssueData ? `${selectedIssueData.title} reported` : 'Issue reported with order',
@@ -96,39 +118,45 @@ const OrderIssue = () => {
           </div>
           
           <div className="order-issue-orders-scroll">
-            {MOCK_ORDERS.map((order) => {
-              const isSelected = selectedOrder?.id === order.id;
-              return (
-                <button 
-                  key={order.id}
-                  className={`order-issue-order-card ${isSelected ? 'selected' : ''}`} 
-                  onClick={() => handleOrderSelect(order)}
-                >
-                  <div className="order-issue-order-img-wrap">
-                    <img 
-                      alt={order.name} 
-                      className="order-issue-order-img" 
-                      src={order.image} 
-                    />
-                    {isSelected && (
-                      <div className="order-issue-check-badge">
-                        <span className="material-symbols-outlined">check</span>
-                      </div>
-                    )}
-                  </div>
-                  <h4 className={`order-issue-order-name ${!isSelected ? 'text-slate-600 dark:text-zinc-400' : ''}`}>
-                    {order.name}
-                  </h4>
-                  <p className="order-issue-order-meta">{order.meta}</p>
-                </button>
-              );
-            })}
+            {recentOrders.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94a3b8', width: '100%' }}>
+                 <p style={{ fontWeight: 600 }}>No recent orders to report issues for.</p>
+              </div>
+            ) : (
+              recentOrders.map((order) => {
+                const isSelected = selectedOrder?.id === order.id;
+                return (
+                  <button 
+                    key={order.id}
+                    className={`order-issue-order-card ${isSelected ? 'selected' : ''}`} 
+                    onClick={() => handleOrderSelect(order)}
+                  >
+                    <div className="order-issue-order-img-wrap">
+                      <img 
+                        alt={order.name} 
+                        className="order-issue-order-img" 
+                        src={order.image} 
+                      />
+                      {isSelected && (
+                        <div className="order-issue-check-badge">
+                          <span className="material-symbols-outlined">check</span>
+                        </div>
+                      )}
+                    </div>
+                    <h4 className={`order-issue-order-name ${!isSelected ? 'text-slate-600 dark:text-zinc-400' : ''}`}>
+                      {order.name}
+                    </h4>
+                    <p className="order-issue-order-meta">{order.meta}</p>
+                  </button>
+                );
+              })
+            )}
           </div>
         </section>
 
         <div className="order-issue-step-wrap mt-8 mb-6">
           <h2 className="text-xl font-extrabold leading-tight text-slate-900 dark:text-slate-100 mb-2">
-            Reporting Issue for {selectedOrder.name}
+            Reporting Issue for {selectedOrder?.name}
           </h2>
           <p className="text-slate-500 dark:text-zinc-400 text-xs leading-relaxed">
             Please select the category that best describes the problem with this specific order.
