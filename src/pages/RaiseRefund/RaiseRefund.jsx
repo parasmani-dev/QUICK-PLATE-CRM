@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { getStoredUser } from '../../services/firebase';
 import useHaptic from '../../hooks/useHaptic';
 import './RaiseRefund.css';
 
@@ -26,11 +28,15 @@ const getInitialOrders = () => {
   return [];
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') || '';
+const isMockMode = !API_BASE_URL;
+
 const RaiseRefund = () => {
   const navigate = useNavigate();
   const { lightTap, mediumTap, success } = useHaptic();
   
   const [recentOrders] = useState(getInitialOrders);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     orderId: recentOrders.length > 0 ? recentOrders[0].id : '',
@@ -51,28 +57,53 @@ const RaiseRefund = () => {
     navigate(-1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     success();
+    setIsSubmitting(true);
     
-    // Save to local storage to mock backend
     const selectedOrder = recentOrders.find(o => o.id === formData.orderId);
+    const desc = formData.description || 'Refund requested for order';
     
-    const newTicket = {
-      id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
-      type: 'Raise Refund',
-      restaurantName: selectedOrder ? selectedOrder.name : `Order #${formData.orderId}`,
-      date: new Date().toISOString(),
-      status: 'UNDER REVIEW',
-      desc: formData.description || 'Refund requested for order',
-      total: selectedOrder ? parseFloat(selectedOrder.total) : 42.50
-    };
-    
-    const existing = JSON.parse(localStorage.getItem('supportTickets') || '[]');
-    localStorage.setItem('supportTickets', JSON.stringify([newTicket, ...existing]));
+    try {
+      if (!isMockMode) {
+        const storedUser = getStoredUser() || {};
+        const payload = {
+          customerId: storedUser.customerId,
+          orderId: selectedOrder?.id,
+          type: 'Raise Refund',
+          description: desc,
+          restaurantName: selectedOrder?.name
+        };
+        
+        await axios.post(`${API_BASE_URL}/services/apexrest/case/create`, payload, {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 15000
+        });
+      } else {
+        await new Promise(r => setTimeout(r, 600)); // mock delay
+      }
+    } catch (err) {
+      console.warn("Backend ticket creation failed or timed out", err);
+    } finally {
+      setIsSubmitting(false);
+      // Save to local storage to mock backend & UI
+      const newTicket = {
+        id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
+        type: 'Raise Refund',
+        restaurantName: selectedOrder ? selectedOrder.name : `Order #${formData.orderId}`,
+        date: new Date().toISOString(),
+        status: 'UNDER REVIEW',
+        desc: desc,
+        total: selectedOrder ? parseFloat(selectedOrder.total) : 42.50
+      };
+      
+      const existing = JSON.parse(localStorage.getItem('supportTickets') || '[]');
+      localStorage.setItem('supportTickets', JSON.stringify([newTicket, ...existing]));
 
-    // Navigate back to support
-    navigate('/support');
+      // Navigate back to support
+      navigate('/support');
+    }
   };
 
   return (
@@ -196,9 +227,9 @@ const RaiseRefund = () => {
 
       {/* Footer Button Area */}
       <footer className="rr-footer">
-        <button className="rr-submit-btn" onClick={handleSubmit}>
-          <span>Submit Refund Ticket</span>
-          <span className="material-symbols-outlined">send</span>
+        <button className="rr-submit-btn" onClick={handleSubmit} disabled={isSubmitting}>
+          <span>{isSubmitting ? 'Submitting...' : 'Submit Refund Ticket'}</span>
+          {!isSubmitting && <span className="material-symbols-outlined">send</span>}
         </button>
         {/* iOS Home Indicator Spacing */}
         <div className="rr-ios-spacer"></div>

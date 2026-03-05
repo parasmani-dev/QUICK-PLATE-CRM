@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { getStoredUser } from '../../services/firebase';
 import useHaptic from '../../hooks/useHaptic';
 import './OrderIssue.css';
 
@@ -52,6 +54,9 @@ const getInitialOrders = () => {
   return [];
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') || '';
+const isMockMode = !API_BASE_URL;
+
 const OrderIssue = () => {
   const navigate = useNavigate();
   const { lightTap, mediumTap } = useHaptic();
@@ -59,6 +64,7 @@ const OrderIssue = () => {
   const [recentOrders] = useState(getInitialOrders);
   const [selectedOrder, setSelectedOrder] = useState(recentOrders[0]);
   const [selectedIssue, setSelectedIssue] = useState('wrong_order');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleBack = () => {
     lightTap();
@@ -75,25 +81,51 @@ const OrderIssue = () => {
     setSelectedIssue(issueId);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     mediumTap();
+    setIsSubmitting(true);
     
-    // Save to local storage to mock backend
     const selectedIssueData = ISSUE_CATEGORIES.find(i => i.id === selectedIssue);
-    const newTicket = {
-      id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
-      type: 'Order Issues',
-      restaurantName: selectedOrder?.name || 'Quick Plate Order',
-      date: new Date().toISOString(),
-      status: 'UNDER REVIEW',
-      desc: selectedIssueData ? `${selectedIssueData.title} reported` : 'Issue reported with order',
-      total: null
-    };
+    const desc = selectedIssueData ? `${selectedIssueData.title} reported` : 'Issue reported with order';
     
-    const existing = JSON.parse(localStorage.getItem('supportTickets') || '[]');
-    localStorage.setItem('supportTickets', JSON.stringify([newTicket, ...existing]));
+    try {
+      if (!isMockMode) {
+        const storedUser = getStoredUser() || {};
+        const payload = {
+          customerId: storedUser.customerId,
+          orderId: selectedOrder?.id,
+          type: 'Order Issue',
+          description: desc,
+          restaurantName: selectedOrder?.name
+        };
+        
+        await axios.post(`${API_BASE_URL}/services/apexrest/case/create`, payload, {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 15000
+        });
+      } else {
+        await new Promise(r => setTimeout(r, 600)); // mock delay
+      }
+    } catch (e) {
+      console.warn("Backend ticket creation failed or timed out", e);
+    } finally {
+      setIsSubmitting(false);
+      // Save to local storage to mock backend & UI
+      const newTicket = {
+        id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
+        type: 'Order Issues',
+        restaurantName: selectedOrder?.name || 'Quick Plate Order',
+        date: new Date().toISOString(),
+        status: 'UNDER REVIEW',
+        desc: desc,
+        total: null
+      };
+      
+      const existing = JSON.parse(localStorage.getItem('supportTickets') || '[]');
+      localStorage.setItem('supportTickets', JSON.stringify([newTicket, ...existing]));
 
-    navigate('/support');
+      navigate('/support');
+    }
   };
 
   return (
@@ -193,9 +225,9 @@ const OrderIssue = () => {
       </main>
 
       <div className="order-issue-footer">
-        <button className="order-issue-submit-btn" onClick={handleSubmit}>
-          Continue
-          <span className="material-symbols-outlined text-sm">arrow_forward</span>
+        <button className="order-issue-submit-btn" onClick={handleSubmit} disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting...' : 'Continue'}
+          {!isSubmitting && <span className="material-symbols-outlined text-sm">arrow_forward</span>}
         </button>
         <p className="order-issue-footer-text">Powered by Salesforce Service Cloud</p>
       </div>
