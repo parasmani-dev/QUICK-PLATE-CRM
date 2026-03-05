@@ -27,10 +27,12 @@ const MOCK_ORDERS = [
 ];
 
 const ISSUE_CATEGORIES = [
+  { id: 'order_not_placed', icon: 'pending_actions', title: 'Order Not Placed', desc: 'Order was placed but not confirmed' },
+  { id: 'no_delivery_agent', icon: 'person_off', title: 'No Delivery Agent Assigned', desc: 'No one picked up the order' },
+  { id: 'mistakenly_ordered', icon: 'error_outline', title: 'Mistakenly Ordered', desc: 'Accidental order placement' },
   { id: 'missing_items', icon: 'inventory_2', title: 'Missing Items', desc: 'Items were left out of the bag' },
-  { id: 'wrong_order', icon: 'shopping_bag', title: 'Wrong Order', desc: "Received someone else's meal" },
-  { id: 'quality_issue', icon: 'thumb_down', title: 'Quality Issue', desc: 'Food was cold or poorly prepared' },
-  { id: 'late_delivery', icon: 'schedule', title: 'Late Delivery', desc: 'Order arrived significantly after ETA' },
+  { id: 'wrong_order', icon: 'swap_horiz', title: 'Wrong Order', desc: "Received someone else's meal" },
+  { id: 'bugs_order_page', icon: 'bug_report', title: 'Bugs in Order Page', desc: 'Encountered technical issues' },
 ];
 
 const getInitialOrders = () => {
@@ -63,7 +65,7 @@ const OrderIssue = () => {
   
   const [recentOrders] = useState(getInitialOrders);
   const [selectedOrder, setSelectedOrder] = useState(recentOrders[0]);
-  const [selectedIssue, setSelectedIssue] = useState('wrong_order');
+  const [selectedIssue, setSelectedIssue] = useState('order_not_placed');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleBack = () => {

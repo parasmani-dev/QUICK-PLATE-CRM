@@ -42,6 +42,7 @@ const RaiseRefund = () => {
     orderId: recentOrders.length > 0 ? recentOrders[0].id : '',
     contactNumber: '+1 (555) 000-1234',
     contactEmail: 'alex.walker@example.com',
+    reason: 'Order Item Missing',
     description: ''
   });
 
@@ -63,7 +64,7 @@ const RaiseRefund = () => {
     setIsSubmitting(true);
     
     const selectedOrder = recentOrders.find(o => o.id === formData.orderId);
-    const desc = formData.description || 'Refund requested for order';
+    const desc = `${formData.reason} - ${formData.description || 'Refund requested for order'}`;
     
     try {
       if (!isMockMode) {
@@ -172,6 +173,25 @@ const RaiseRefund = () => {
                 value={formData.contactEmail}
                 onChange={handleChange}
               />
+            </div>
+          </div>
+
+          {/* Reason for Refund */}
+          <div className="rr-form-group">
+            <label className="rr-label">Reason for Refund</label>
+            <div className="rr-input-wrapper">
+              <select 
+                name="reason" 
+                className="rr-input rr-select" 
+                value={formData.reason}
+                onChange={handleChange}
+              >
+                <option value="Order Item Missing">Order Item Missing</option>
+                <option value="Quality Issue">Quality Issue</option>
+                <option value="Quantity Issue">Quantity Issue</option>
+                <option value="Package Damaged">Package Damaged</option>
+                <option value="Late Delivery">Late Delivery</option>
+              </select>
             </div>
           </div>
 

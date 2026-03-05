@@ -102,9 +102,19 @@ const PaymentIssue = () => {
       description: 'My cancellation refund hasn\'t arrived yet'
     },
     {
-      id: 'payment_failed',
-      title: 'Payment Failed but Amount Deducted',
+      id: 'payment_failed_amount_deducted',
+      title: 'Payment Failed But Amount Deducted',
       description: 'The app showed an error but money was taken'
+    },
+    {
+      id: 'over_than_mrp',
+      title: 'Over Than MRP Price',
+      description: 'Charged more than the listed price'
+    },
+    {
+      id: 'payment_failed',
+      title: 'Payment Failed',
+      description: 'Transaction was unsuccessful'
     }
   ];
 
