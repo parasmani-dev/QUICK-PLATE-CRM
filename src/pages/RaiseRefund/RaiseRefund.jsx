@@ -3,12 +3,37 @@ import { useNavigate } from 'react-router-dom';
 import useHaptic from '../../hooks/useHaptic';
 import './RaiseRefund.css';
 
+const getInitialOrders = () => {
+  try {
+    const stored = localStorage.getItem('quickplate_orders');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const past = parsed.filter(order => order.status === 'DELIVERED' || order.status === 'Delivered' || order.status === 'REFUNDED').slice(0, 8);
+      if (past.length > 0) {
+        return past.map(o => ({
+          id: o.id,
+          name: o.restaurantName,
+          meta: `${o.status === 'REFUNDED' || o.status === 'Refunded' ? 'Refunded' : 'Delivered'} • ${o.date}`,
+          date: o.date,
+          image: o.image,
+          total: typeof o.total === 'number' ? o.total.toFixed(2) : o.total
+        }));
+      }
+    }
+  } catch (e) {
+    console.warn("Failed to parse orders from localStorage", e);
+  }
+  return [];
+};
+
 const RaiseRefund = () => {
   const navigate = useNavigate();
   const { lightTap, mediumTap, success } = useHaptic();
   
+  const [recentOrders] = useState(getInitialOrders);
+
   const [formData, setFormData] = useState({
-    orderId: '12345',
+    orderId: recentOrders.length > 0 ? recentOrders[0].id : '',
     contactNumber: '+1 (555) 000-1234',
     contactEmail: 'alex.walker@example.com',
     description: ''
@@ -31,14 +56,16 @@ const RaiseRefund = () => {
     success();
     
     // Save to local storage to mock backend
+    const selectedOrder = recentOrders.find(o => o.id === formData.orderId);
+    
     const newTicket = {
       id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
       type: 'Raise Refund',
-      restaurantName: `Order #${formData.orderId}`,
+      restaurantName: selectedOrder ? selectedOrder.name : `Order #${formData.orderId}`,
       date: new Date().toISOString(),
       status: 'UNDER REVIEW',
       desc: formData.description || 'Refund requested for order',
-      total: formData.orderId === '12345' ? 42.50 : formData.orderId === '12344' ? 18.20 : 35.00
+      total: selectedOrder ? parseFloat(selectedOrder.total) : 42.50
     };
     
     const existing = JSON.parse(localStorage.getItem('supportTickets') || '[]');
@@ -80,9 +107,15 @@ const RaiseRefund = () => {
                 value={formData.orderId}
                 onChange={handleChange}
               >
-                <option value="12345">Order #12345 - Oct 24, 2023 ($42.50)</option>
-                <option value="12344">Order #12344 - Oct 20, 2023 ($18.20)</option>
-                <option value="12343">Order #12343 - Oct 15, 2023 ($35.00)</option>
+                {recentOrders.length === 0 ? (
+                  <option value="">No recent orders available</option>
+                ) : (
+                  recentOrders.map(order => (
+                    <option key={order.id} value={order.id}>
+                      {order.name} - {order.date} (${order.total})
+                    </option>
+                  ))
+                )}
               </select>
             </div>
           </div>

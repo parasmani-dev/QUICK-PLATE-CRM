@@ -2,11 +2,36 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useHaptic from '../../hooks/useHaptic';
 import './PaymentIssue.css';
+import '../OrderIssue/OrderIssue.css'; // For order selection slider styles
+
+const getInitialOrders = () => {
+  try {
+    const stored = localStorage.getItem('quickplate_orders');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const past = parsed.filter(order => order.status === 'DELIVERED' || order.status === 'Delivered' || order.status === 'REFUNDED').slice(0, 8);
+      if (past.length > 0) {
+        return past.map(o => ({
+          id: o.id,
+          name: o.restaurantName,
+          meta: `${o.status === 'REFUNDED' || o.status === 'Refunded' ? 'Refunded' : 'Delivered'} • ${o.date}`,
+          image: o.image,
+          total: o.total
+        }));
+      }
+    }
+  } catch (e) {
+    console.warn("Failed to parse orders from localStorage", e);
+  }
+  return [];
+};
 
 const PaymentIssue = () => {
   const navigate = useNavigate();
   const { lightTap, mediumTap } = useHaptic();
   
+  const [recentOrders] = useState(getInitialOrders);
+  const [selectedOrder, setSelectedOrder] = useState(recentOrders[0]);
   const [selectedIssue, setSelectedIssue] = useState('double_charged');
   const [additionalDetails, setAdditionalDetails] = useState('');
 
@@ -19,11 +44,11 @@ const PaymentIssue = () => {
     const newTicket = {
       id: `CASE-${Math.floor(Math.random() * 90000) + 10000}`,
       type: 'Payment Issue',
-      restaurantName: 'The Burger Joint',
+      restaurantName: selectedOrder?.name || 'Quick Plate Order',
       date: new Date().toISOString(),
       status: 'UNDER REVIEW',
       desc: selectedIssueData ? `${selectedIssueData.title}` : 'Payment problem reported',
-      total: 42.50
+      total: selectedOrder?.total || 42.50
     };
     
     const existing = JSON.parse(localStorage.getItem('supportTickets') || '[]');
@@ -68,16 +93,47 @@ const PaymentIssue = () => {
         </div>
 
         {/* Order Selection Card */}
-        <h3 className="section-heading">Order Selection</h3>
-        <div className="order-selection-card">
-          <div className="order-selection-info">
-             <div>
-                <p className="order-selection-name">The Burger Joint</p>
-                <p className="order-selection-id">Order #QP-984210</p>
-             </div>
-             <p className="order-selection-price">$42.50 • Oct 24, 2023</p>
+        <div className="order-issue-step-wrap mb-4 px-0">
+          <div className="flex justify-between items-center" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+            <h3 className="section-heading" style={{ marginBottom: 0 }}>Select Recent Order</h3>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f97f1a', cursor: 'pointer' }}>View All</span>
           </div>
-          <div className="order-selection-image" style={{backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuAC551V4q37pQ0WPnckhW2McHWbsjtrOq5cwiyVz7OfBSzPjeYqg8Ve6pGP0yE2UhN5sFuwRrxQRh-ZlM22se1bNFpMNGKIBJ7ptQvhyG6-W9daWqvmJajJWaOb7iLdx-WAawTUewsoEhsChQQvFO2QuINFaiTT6-oaki7P5LJlKBTI7VAVQc9sLN_cr7YvE8l97MLSMjoBT-WcrbcSUEkLjqSWQ5kCqGwb-7ohhb2QPNImdObl_RBwGFschQ1hBHy3BZtzeDBoYCBw")`}}></div>
+        </div>
+        
+        <div className="order-issue-orders-scroll" style={{ padding: '0 0 1rem 0' }}>
+          {recentOrders.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#94a3b8', width: '100%', border: '1px border #e2e8f0', borderRadius: '0.75rem' }}>
+               <p style={{ fontWeight: 600 }}>No recent orders to report issues for.</p>
+            </div>
+          ) : (
+            recentOrders.map((order) => {
+              const isSelected = selectedOrder?.id === order.id;
+              return (
+                <button 
+                  key={order.id}
+                  className={`order-issue-order-card ${isSelected ? 'selected' : ''}`} 
+                  onClick={() => { lightTap(); setSelectedOrder(order); }}
+                >
+                  <div className="order-issue-order-img-wrap">
+                    <img 
+                      alt={order.name} 
+                      className="order-issue-order-img" 
+                      src={order.image} 
+                    />
+                    {isSelected && (
+                      <div className="order-issue-check-badge">
+                        <span className="material-symbols-outlined">check</span>
+                      </div>
+                    )}
+                  </div>
+                  <h4 className={`order-issue-order-name ${!isSelected ? 'text-slate-600 dark:text-zinc-400' : ''}`}>
+                    {order.name}
+                  </h4>
+                  <p className="order-issue-order-meta">{order.meta}</p>
+                </button>
+              );
+            })
+          )}
         </div>
 
         {/* Payment Problem Category Selector */}
