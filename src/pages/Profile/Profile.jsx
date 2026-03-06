@@ -1,70 +1,19 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import useHaptic from '../../hooks/useHaptic';
 import useAppStore from '../../store/useAppStore';
 import { logoutUser } from '../../services/firebase';
 import './Profile.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const isMockMode = !API_BASE_URL;
+
 /* ─── Mock Data ─── */
 import userEmoji from '../../assets/images/Emoji.avif';
 const USER_IMG = userEmoji;
 
-const STATS = [
-  { label: 'Total Orders', value: '47', icon: 'local_mall', color: 'indigo' },
-  { label: 'Favorites', value: '12', icon: 'favorite', color: 'red' },
-  { label: 'Reviews', value: '8', icon: 'star', color: 'yellow' },
-];
-
-const PAST_DELIVERIES = [
-  {
-    id: '#QP-9014',
-    restaurant: 'Sakura Omakase',
-    date: 'Oct 12, 2026',
-    items: '2x Spicy Tuna Roll, 1x Miso Soup',
-    amount: '$42.50',
-    status: 'Delivered',
-  },
-  {
-    id: '#QP-8922',
-    restaurant: 'Masala Tango',
-    date: 'Oct 08, 2026',
-    items: '1x Chicken Tikka, 2x Garlic Naan',
-    amount: '$31.00',
-    status: 'Delivered',
-  },
-  {
-    id: '#QP-8801',
-    restaurant: 'The Luminary Grill',
-    date: 'Oct 01, 2026',
-    items: '1x Truffle Burger, 1x Loaded Fries',
-    amount: '$28.75',
-    status: 'Delivered',
-  },
-];
-
-const TRANSACTIONS = [
-  {
-    title: 'Added to Wallet',
-    date: 'Oct 10, 2026',
-    amount: '+$50.00',
-    type: 'credit',
-    icon: 'account_balance_wallet',
-  },
-  {
-    title: 'Order Refund',
-    date: 'Sep 25, 2026',
-    amount: '+$14.20',
-    type: 'credit',
-    icon: 'currency_exchange',
-  },
-  {
-    title: 'Quick Plate Pro Sub',
-    date: 'Sep 01, 2026',
-    amount: '-$9.99',
-    type: 'debit',
-    icon: 'workspace_premium',
-  },
-];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -78,6 +27,129 @@ const Profile = () => {
   const { lightTap, mediumTap } = useHaptic();
   const navigate = useNavigate();
   const { user, logout } = useAppStore();
+  
+  const [pastDeliveries, setPastDeliveries] = useState([]);
+  const [loadingDeliveries, setLoadingDeliveries] = useState(true);
+  
+  const [totalOrdersCount, setTotalOrdersCount] = useState(0);
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        if (isMockMode) {
+           const cached = JSON.parse(localStorage.getItem('quickplate_orders') || '[]');
+            if (cached.length > 0) {
+               const past = cached.filter(o => ['DELIVERED', 'Delivered', 'REFUNDED'].includes(o.status)).slice(0, 3);
+               setPastDeliveries(past);
+               setTotalOrdersCount(cached.length);
+               
+               const txns = cached.map(o => {
+                 let amountStr = typeof o.total === 'number' ? o.total.toFixed(2) : o.total;
+                 return {
+                   title: ['REFUNDED', 'Refuned'].includes(o.status) ? `Refund: ${o.restaurantName}` : o.restaurantName,
+                   date: o.date,
+                   amount: ['REFUNDED', 'Refuned'].includes(o.status) ? `+$${amountStr}` : `-$${amountStr}`,
+                   type: ['REFUNDED', 'Refuned'].includes(o.status) ? 'credit' : 'debit',
+                   icon: ['REFUNDED', 'Refuned'].includes(o.status) ? 'currency_exchange' : 'receipt_long',
+                 };
+               }).slice(0, 4);
+               setTransactions(txns);
+           } else {
+               const mockPast = [
+                  {
+                    id: '#QP-9014',
+                    restaurantName: 'Sakura Omakase',
+                    date: 'Oct 12, 2026',
+                    total: 42.50,
+                    status: 'Delivered',
+                  },
+                  {
+                    id: '#QP-8922',
+                    restaurantName: 'Masala Tango',
+                    date: 'Oct 08, 2026',
+                    total: 31.00,
+                    status: 'Delivered',
+                  },
+                  {
+                    id: '#QP-8801',
+                    restaurantName: 'The Luminary Grill',
+                    date: 'Oct 01, 2026',
+                    total: 28.75,
+                    status: 'Delivered',
+                  },
+               ];
+               setPastDeliveries(mockPast);
+               setTotalOrdersCount(3);
+               
+               const txns = mockPast.map(o => {
+                 let amountStr = typeof o.total === 'number' ? o.total.toFixed(2) : o.total;
+                 return {
+                   title: o.restaurantName,
+                   date: o.date,
+                   amount: `-$${amountStr}`,
+                   type: 'debit',
+                   icon: 'receipt_long',
+                 };
+               });
+               setTransactions(txns);
+           }
+        } else {
+            const storedUser = JSON.parse(localStorage.getItem('quickplate_user') || '{}');
+            const customerId = storedUser?.customerId;
+            if (!customerId) return;
+            const res = await axios.get(`${API_BASE_URL}/services/apexrest/customer/orders?customerId=${customerId}`);
+            if (res.data && res.data.length > 0) {
+              const mappedData = res.data.map(item => ({
+                id: item.Id || item.id || 'N/A',
+                restaurantName: item.restaurantName || 'Quick Plate Order',
+                date: item.CreatedDate ? new Date(item.CreatedDate).toLocaleDateString() : item.date || 'Today',
+                total: item.totalAmount || item.total || 0,
+                status: item.orderStatus || item.status || 'PLACED',
+              }));
+              const past = mappedData.filter(o => ['DELIVERED', 'Delivered', 'REFUNDED'].includes(o.status)).slice(0, 3);
+              setPastDeliveries(past);
+              setTotalOrdersCount(mappedData.length);
+              
+              const txns = mappedData.map(o => {
+                 let amountStr = typeof o.total === 'number' ? o.total.toFixed(2) : o.total;
+                 return {
+                   title: ['REFUNDED', 'Refuned'].includes(o.status) ? `Refund: ${o.restaurantName}` : o.restaurantName,
+                   date: o.date,
+                   amount: ['REFUNDED', 'Refuned'].includes(o.status) ? `+$${amountStr}` : `-$${amountStr}`,
+                   type: ['REFUNDED', 'Refuned'].includes(o.status) ? 'credit' : 'debit',
+                   icon: ['REFUNDED', 'Refuned'].includes(o.status) ? 'currency_exchange' : 'receipt_long',
+                 };
+              }).slice(0, 4);
+              setTransactions(txns);
+            }
+        }
+      } catch (err) {
+        console.error('Error fetching orders for profile:', err);
+        const cached = JSON.parse(localStorage.getItem('quickplate_orders') || '[]');
+        if (cached.length > 0) {
+           const past = cached.filter(o => ['DELIVERED', 'Delivered', 'REFUNDED'].includes(o.status)).slice(0, 3);
+           setPastDeliveries(past);
+           setTotalOrdersCount(cached.length);
+           
+           const txns = cached.map(o => {
+              let amountStr = typeof o.total === 'number' ? o.total.toFixed(2) : o.total;
+              return {
+                 title: ['REFUNDED', 'Refuned'].includes(o.status) ? `Refund: ${o.restaurantName}` : o.restaurantName,
+                 date: o.date,
+                 amount: ['REFUNDED', 'Refuned'].includes(o.status) ? `+$${amountStr}` : `-$${amountStr}`,
+                 type: ['REFUNDED', 'Refuned'].includes(o.status) ? 'credit' : 'debit',
+                 icon: ['REFUNDED', 'Refuned'].includes(o.status) ? 'currency_exchange' : 'receipt_long',
+              };
+           }).slice(0, 4);
+           setTransactions(txns);
+        }
+      } finally {
+        setLoadingDeliveries(false);
+      }
+    };
+    fetchOrders();
+  }, []);
 
   const handleLogout = async () => {
     mediumTap();
@@ -92,6 +164,12 @@ const Profile = () => {
       navigate('/');
     }
   };
+
+  const dynamicStats = [
+    { label: 'Total Orders', value: totalOrdersCount.toString(), icon: 'local_mall', color: 'indigo', action: null },
+    { label: 'Favorites', value: '12', icon: 'favorite', color: 'red', action: null },
+    { label: 'Wallet', value: '$0.00', icon: 'account_balance_wallet', color: 'orange', action: () => { mediumTap(); navigate('/customerwallet'); } },
+  ];
 
   return (
     <div className="profile-page">
@@ -122,8 +200,13 @@ const Profile = () => {
           <p className="profile-user-phone">{user?.email || "foodie@quickplate.com"}</p>
           
           <div className="profile-stats">
-            {STATS.map((stat, i) => (
-              <div key={i} className="profile-stat-box">
+            {dynamicStats.map((stat, i) => (
+              <div 
+                key={i} 
+                className={`profile-stat-box ${stat.action ? 'clickable-stat' : ''}`}
+                onClick={stat.action || undefined}
+                style={stat.action ? { cursor: 'pointer' } : {}}
+              >
                 <div className={`profile-stat-icon color-${stat.color}`}>
                   <span className="material-symbols-outlined">{stat.icon}</span>
                 </div>
@@ -148,24 +231,32 @@ const Profile = () => {
           </div>
           
           <div className="profile-cards-list">
-            {PAST_DELIVERIES.map((order, i) => (
-              <div key={i} className="profile-order-card glass-card">
-                <div className="order-card-top">
-                  <div className="order-icon">
-                    <span className="material-symbols-outlined">restaurant</span>
+            {loadingDeliveries ? (
+              <p style={{textAlign: 'center', fontSize: '14px', color: '#94a3b8', padding: '1rem'}}>Loading past deliveries...</p>
+            ) : pastDeliveries.length > 0 ? (
+              pastDeliveries.map((order, i) => (
+                <div key={i} className="profile-order-card glass-card">
+                  <div className="order-card-top">
+                    <div className="order-icon">
+                      <span className="material-symbols-outlined">restaurant</span>
+                    </div>
+                    <div className="order-title-box">
+                      <h4>{order.restaurantName || order.restaurant}</h4>
+                      <p>{order.date} • {String(order.id).startsWith('#') ? order.id : `#${order.id}`}</p>
+                    </div>
+                    <div className="order-price">${typeof order.total === 'number' ? order.total.toFixed(2) : order.total || order.amount}</div>
                   </div>
-                  <div className="order-title-box">
-                    <h4>{order.restaurant}</h4>
-                    <p>{order.date} • {order.id}</p>
+                  <div className="order-card-bottom">
+                    <span className="order-items">{order.items || "Standard Order"}</span>
+                    <span className={`order-status ${['REFUNDED', 'Refuned'].includes(order.status) ? 'badge-slate' : 'badge-success'}`}>
+                      {['DELIVERED', 'Delivered'].includes(order.status) ? 'Delivered' : order.status}
+                    </span>
                   </div>
-                  <div className="order-price">{order.amount}</div>
                 </div>
-                <div className="order-card-bottom">
-                  <span className="order-items">{order.items}</span>
-                  <span className="order-status badge-success">{order.status}</span>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+               <p style={{textAlign: 'center', fontSize: '14px', color: '#94a3b8', padding: '1rem'}}>No past deliveries found.</p>
+            )}
           </div>
         </motion.section>
 
@@ -183,20 +274,26 @@ const Profile = () => {
           </div>
           
           <div className="profile-cards-list">
-            {TRANSACTIONS.map((tx, i) => (
-              <div key={i} className="profile-tx-card glass-card">
-                <div className={`tx-icon ${tx.type === 'credit' ? 'tx-icon-credit' : 'tx-icon-debit'}`}>
-                  <span className="material-symbols-outlined">{tx.icon}</span>
+            {loadingDeliveries ? (
+              <p style={{textAlign: 'center', fontSize: '14px', color: '#94a3b8', padding: '1rem'}}>Loading transactions...</p>
+            ) : transactions.length > 0 ? (
+              transactions.map((tx, i) => (
+                <div key={i} className="profile-tx-card glass-card">
+                  <div className={`tx-icon ${tx.type === 'credit' ? 'tx-icon-credit' : 'tx-icon-debit'}`}>
+                    <span className="material-symbols-outlined">{tx.icon}</span>
+                  </div>
+                  <div className="tx-info">
+                    <h4>{tx.title}</h4>
+                    <p>{tx.date}</p>
+                  </div>
+                  <div className={`tx-amount ${tx.type === 'credit' ? 'tx-amount-green' : ''}`}>
+                    {tx.amount}
+                  </div>
                 </div>
-                <div className="tx-info">
-                  <h4>{tx.title}</h4>
-                  <p>{tx.date}</p>
-                </div>
-                <div className={`tx-amount ${tx.type === 'credit' ? 'tx-amount-green' : ''}`}>
-                  {tx.amount}
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+               <p style={{textAlign: 'center', fontSize: '14px', color: '#94a3b8', padding: '1rem'}}>No transactions found.</p>
+            )}
           </div>
         </motion.section>
         
@@ -208,7 +305,7 @@ const Profile = () => {
           animate="visible"
           custom={0.3}
         >
-          <button className="profile-action-row glass-card" onClick={lightTap}>
+          <button className="profile-action-row glass-card" onClick={() => { mediumTap(); navigate('/support'); }}>
             <div className="action-row-left">
               <span className="material-symbols-outlined text-slate-400">help</span>
               <span>Help & Support</span>

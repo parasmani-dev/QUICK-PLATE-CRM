@@ -24,6 +24,7 @@ const Support = lazy(() => import('./pages/Support/Support'));
 const RaiseRefund = lazy(() => import('./pages/RaiseRefund/RaiseRefund'));
 const PaymentIssue = lazy(() => import('./pages/PaymentIssue/PaymentIssue'));
 const OrderIssue = lazy(() => import('./pages/OrderIssue/OrderIssue'));
+const CustomerWallet = lazy(() => import('./pages/CustomerWallet/CustomerWallet'));
 
 /** Loading fallback */
 const LoadingScreen = () => (
@@ -100,6 +101,7 @@ function App() {
             <Route path="/raise-refund" element={<RaiseRefund />} />
             <Route path="/payment-issue" element={<PaymentIssue />} />
             <Route path="/order-issue" element={<OrderIssue />} />
+            <Route path="/customerwallet" element={<CustomerWallet />} />
             {/* More routes will be added as pages are built */}
           </Routes>
         </AnimatePresence>

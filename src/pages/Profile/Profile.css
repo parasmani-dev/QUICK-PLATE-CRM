@@ -149,6 +149,7 @@
 .color-indigo { background: rgba(79, 70, 229, 0.1); color: #4F46E5; }
 .color-red { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
 .color-yellow { background: rgba(234, 179, 8, 0.1); color: #EAB308; }
+.color-orange { background: rgba(251, 126, 24, 0.1); color: #fb7e18; }
 
 .profile-stat-box h3 {
   font-size: 1.25rem;
