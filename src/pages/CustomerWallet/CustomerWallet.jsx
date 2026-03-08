@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useHaptic from '../../hooks/useHaptic';
@@ -14,6 +15,13 @@ const fadeUp = {
 const CustomerWallet = () => {
   const navigate = useNavigate();
   const { lightTap, mediumTap } = useHaptic();
+  
+  const [transactions] = useState(() => JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]'));
+  
+  const [balance] = useState(() => {
+    const txns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
+    return txns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+  });
 
   return (
     <div className="wallet-page">
@@ -34,7 +42,7 @@ const CustomerWallet = () => {
           custom={0}
         >
           <p className="balance-label">Available Balance</p>
-          <h2 className="balance-amount">$0.00</h2>
+          <h2 className="balance-amount">${balance.toFixed(2)}</h2>
         </motion.div>
 
         <motion.div 
@@ -44,7 +52,7 @@ const CustomerWallet = () => {
           animate="visible"
           custom={0.1}
         >
-          <button className="action-btn" onClick={mediumTap}>
+          <button className="action-btn" onClick={() => { mediumTap(); navigate('/wallet-payment'); }}>
             <div className="action-icon">
               <span className="material-symbols-outlined">add</span>
             </div>
@@ -66,10 +74,39 @@ const CustomerWallet = () => {
           custom={0.2}
         >
           <h3 className="activity-title">Recent Activity</h3>
-          <div className="empty-state">
-             <span className="material-symbols-outlined">receipt_long</span>
-             <p>No recent wallet transactions.</p>
-          </div>
+          {transactions.length > 0 ? (
+            <div className="wallet-txns-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {transactions.map((tx, idx) => (
+                <div key={idx} className="wallet-txn-item" style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: 'white',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+                  gap: '12px'
+                }}>
+                  <div className="txn-icon" style={{
+                    width: 40, height: 40, borderRadius: '50%', background: parseFloat(tx.amount) >= 0 ? '#e6ffe6' : '#ffe6e6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: parseFloat(tx.amount) >= 0 ? '#00B894' : '#FF7675'
+                  }}>
+                    <span className="material-symbols-outlined">{parseFloat(tx.amount) >= 0 ? 'add_card' : 'shopping_bag'}</span>
+                  </div>
+                  <div className="txn-details" style={{ flex: 1 }}>
+                    <h4 style={{ margin: 0, fontSize: '14px', color: '#1a202c' }}>{tx.description || 'Added to Wallet'}</h4>
+                    <span style={{ fontSize: '12px', color: '#718096' }}>{new Date(tx.date).toLocaleDateString()}</span>
+                  </div>
+                  <div className="txn-amount" style={{ fontSize: '14px', fontWeight: 'bold', color: parseFloat(tx.amount) >= 0 ? '#00B894' : '#FF7675' }}>
+                    {parseFloat(tx.amount) >= 0 ? '+' : '-'}${Math.abs(parseFloat(tx.amount)).toFixed(2)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+               <span className="material-symbols-outlined">receipt_long</span>
+               <p>No recent wallet transactions.</p>
+            </div>
+          )}
         </motion.div>
       </main>
     </div>

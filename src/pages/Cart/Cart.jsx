@@ -33,8 +33,13 @@ const Cart = () => {
   const subtotal = getCartTotal();
   const deliveryFee = 0; // FREE in mockup
   const taxes = subtotal > 0 ? 4.50 : 0;
-  const walletApplied = useWallet && subtotal > 0 ? 5.00 : 0;
-  
+
+  // Calculate Wallet Balance dynamically
+  const walletTxns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
+  const walletBalance = walletTxns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+  const maxApplicableWallet = Math.min(walletBalance, subtotal + deliveryFee + taxes);
+
+  const walletApplied = useWallet && subtotal > 0 ? maxApplicableWallet : 0;
   const totalPay = subtotal + deliveryFee + taxes - walletApplied;
 
   const handleCheckout = async () => {
@@ -85,7 +90,7 @@ const Cart = () => {
       const orderId = response.data.orderId;
       console.log('Order Created Successfully:', orderId);
 
-      navigate('/checkout', { state: { orderId } });
+      navigate('/checkout', { state: { orderId, useWallet } });
 
     } catch (error) {
       console.error('Order Creation Error:', error);

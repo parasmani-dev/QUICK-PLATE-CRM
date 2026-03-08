@@ -265,9 +265,19 @@ const Support = () => {
                            {ticket.total && <span className="st-price">${Number(ticket.total).toFixed(2)}</span>}
                          </div>
                          <p className="st-meta">{ticket.ticketNumber || ticket.ticketId} • {ticket.createdAt || 'Recently'}</p>
-                         <div className={`st-badge ${statusTag.class}`}>
-                            <span className="material-symbols-outlined" style={{ fontSize: '12px', marginRight: '4px' }}>sync</span>
-                            {statusTag.label.toUpperCase()}
+                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '4px' }}>
+                           <div className={`st-badge ${statusTag.class}`} style={{ margin: 0 }}>
+                              <span className="material-symbols-outlined" style={{ fontSize: '12px', marginRight: '4px' }}>sync</span>
+                              {statusTag.label.toUpperCase()}
+                           </div>
+                           {(ticket.Description || ticket.description) && (
+                             <div style={{ fontSize: '12px', color: '#666', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center', gap: '4px', background: '#f8f9fa', padding: '4px 8px', borderRadius: '4px' }}>
+                               <span className="material-symbols-outlined" style={{ fontSize: '14px', color: '#ff7a00' }}>support_agent</span>
+                               <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                 {ticket.Description || ticket.description}
+                               </span>
+                             </div>
+                           )}
                          </div>
                        </div>
                     </div>
@@ -297,7 +307,15 @@ const Support = () => {
                                     {STATUS_LABELS[statusKey]}
                                   </h5>
                                   {isCurrent ? (
-                                    <p className="st-step-time">{ticket.createdAt || 'Just now'}</p>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                      <p className="st-step-time" style={{ margin: 0 }}>{ticket.createdAt || 'Just now'}</p>
+                                      {(ticket.Description || ticket.description) && (
+                                        <p style={{ fontSize: '12px', color: '#666', margin: 0, display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px' }}>
+                                          <span className="material-symbols-outlined" style={{ fontSize: '14px', color: '#ff7a00' }}>chat</span>
+                                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{ticket.Description || ticket.description}</span>
+                                        </p>
+                                      )}
+                                    </div>
                                   ) : isCompleted ? (
                                     <p className="st-step-time">Completed</p>
                                   ) : (

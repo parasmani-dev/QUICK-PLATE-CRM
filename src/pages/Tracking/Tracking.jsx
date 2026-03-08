@@ -37,11 +37,14 @@ const Tracking = () => {
 
   const pollingRef = useRef(null);
   const simIntervalRef = useRef(null);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
     if (!orderId) return;
 
     const fetchStatus = async () => {
+      if (isFetchingRef.current) return;
+      isFetchingRef.current = true;
       try {
         let data = null;
 
@@ -77,15 +80,16 @@ const Tracking = () => {
               .includes(data.orderStatus)
           ) {
             if (pollingRef.current) {
-              clearInterval(pollingRef.current);
+               clearInterval(pollingRef.current);
             }
           }
         }
 
-        setLoading(false);
-
       } catch (err) {
         console.error('Tracking error:', err);
+      } finally {
+        isFetchingRef.current = false;
+        setLoading(false);
       }
     };
 
@@ -97,8 +101,11 @@ const Tracking = () => {
       pollingRef.current = setInterval(fetchStatus, 3000);
     }
 
-    return () => clearInterval(pollingRef.current);
-
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+      }
+    };
   }, [orderId]);
 
   // Frontend simulation logic handling page refreshes

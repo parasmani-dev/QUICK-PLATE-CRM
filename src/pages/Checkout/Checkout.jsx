@@ -40,12 +40,24 @@ const CheckoutForm = () => {
   // Calculated Totals
   const subtotal = getCartTotal();
   const deliveryFee = 0; // FREE
-  const walletApplied = 5.00;
-  const taxes = subtotal > 0 ? 4.50 : 0;
+  
+  // Calculate Wallet Balance dynamically
+  const walletTxns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
+  const walletBalance = walletTxns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+  
+  // Max we can apply is the subtotal + deliveryFee + taxes (calculated without wallet first)
+  const taxesPreWallet = subtotal > 0 ? 4.50 : 0;
+  const maxApplicableWallet = Math.min(walletBalance, subtotal + deliveryFee + taxesPreWallet);
+  
+  const useWallet = location.state?.useWallet !== false; // default true if missing
+  const walletApplied = useWallet ? maxApplicableWallet : 0;
+
+  const taxes = taxesPreWallet;
   const totalPayStr = Math.max(0, subtotal > 0 ? subtotal + deliveryFee + taxes - walletApplied : 0).toFixed(2);
   const totalPayCents = Math.round(parseFloat(totalPayStr) * 100);
 
   const pollingTimerRef = useRef(null);
+  const isSubmittingRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -74,6 +86,19 @@ const CheckoutForm = () => {
         if (isPaid) {
           clearInterval(pollingTimerRef.current);
           successTap();
+
+          if (walletApplied > 0) {
+            const txns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
+            txns.unshift({
+               id: 'WTX-' + Math.floor(100000 + Math.random() * 900000),
+               amount: -walletApplied,
+               date: new Date().toISOString(),
+               type: 'Order Deduct',
+               description: 'Payment for order ' + orderId
+            });
+            localStorage.setItem('quickplate_wallet_txns', JSON.stringify(txns));
+          }
+
           setUiState(UI_STATES.SUCCESS);
           
           setTimeout(() => {
@@ -88,6 +113,7 @@ const CheckoutForm = () => {
         errorTap();
         setErrorMessage(err.message || 'Error communicating with backend.');
         setUiState(UI_STATES.FAILED);
+        isSubmittingRef.current = false;
       }
     };
 
@@ -96,6 +122,9 @@ const CheckoutForm = () => {
   };
 
   const handlePaySubmit = async () => {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+
     heavyTap();
     setUiState(UI_STATES.PROCESSING);
     setErrorMessage('');
@@ -107,7 +136,13 @@ const CheckoutForm = () => {
         throw new Error('Order tracking ID is missing. Please initiate from the cart.');
       }
 
-      if (paymentMethod === 'card') {
+      if (totalPayCents === 0) {
+        // Wallet covers everything, bypass external payment gateway
+        if (isMockMode) {
+          await new Promise(r => setTimeout(r, 1000));
+        }
+        startBackendPolling(orderId);
+      } else if (paymentMethod === 'card') {
         const response = await axios.post(
           `${API_BASE_URL}/services/apexrest/checkout/create-session`,
           { orderId },
@@ -136,6 +171,7 @@ const CheckoutForm = () => {
         startBackendPolling(orderId);
       }
     } catch (err) {
+      isSubmittingRef.current = false;
       errorTap();
       setErrorMessage(err.message || 'An unexpected error occurred processing your order.');
       setUiState(UI_STATES.FAILED);
@@ -184,7 +220,7 @@ const CheckoutForm = () => {
                 <p className="checkout-state-desc">{errorMessage}</p>
                 <button 
                   className="retry-btn" 
-                  onClick={() => { lightTap(); setUiState(UI_STATES.READY); setErrorMessage(''); }}
+                  onClick={() => { lightTap(); isSubmittingRef.current = false; setUiState(UI_STATES.READY); setErrorMessage(''); }}
                 >
                   Retry Payment
                 </button>
@@ -221,72 +257,112 @@ const CheckoutForm = () => {
 
             {/* ─── Section: Amount To Pay ─── */}
             <div className="co-section">
-              <div className="co-pay-card">
-                <div className="co-pay-left">
-                  <div className="amount-label">Amount to Pay</div>
-                  <div className="amount-value">${totalPayStr}</div>
+              <div className="co-pay-card" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div className="co-pay-left">
+                    <div className="amount-label">Amount to Pay</div>
+                    <div className="amount-value">${totalPayStr}</div>
+                  </div>
+                  <div className="co-pay-icon">
+                    <span className="material-symbols-outlined" style={{ fontSize: '28px' }}>receipt_long</span>
+                  </div>
                 </div>
-                <div className="co-pay-icon">
-                  <span className="material-symbols-outlined" style={{ fontSize: '28px' }}>receipt_long</span>
-                </div>
+                
+                {walletApplied > 0 && (
+                  <div style={{
+                    marginTop: '12px',
+                    paddingTop: '12px',
+                    borderTop: '1px dashed #e2e8f0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#4a5568' }}>
+                      <span>Subtotal & Taxes</span>
+                      <span>${(subtotal + deliveryFee + taxesPreWallet).toFixed(2)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#00B894', fontWeight: '500' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>account_balance_wallet</span>
+                        Wallet Applied
+                      </span>
+                      <span>- ${walletApplied.toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* ─── Section: Payment Method ─── */}
-            <div className="co-section">
-              <h2 className="co-section-title">Payment Method</h2>
+            {totalPayCents > 0 ? (
+              <div className="co-section">
+                <h2 className="co-section-title">Payment Method</h2>
 
-              {/* Card Option */}
-              <div 
-                className={`co-method-row ${paymentMethod === 'card' ? 'selected' : ''}`}
-                onClick={() => { mediumTap(); setPaymentMethod('card'); }}
-              >
-                <div className="co-method-icon">
-                  <span className="material-symbols-outlined">credit_card</span>
+                {/* Card Option */}
+                <div 
+                  className={`co-method-row ${paymentMethod === 'card' ? 'selected' : ''}`}
+                  onClick={() => { mediumTap(); setPaymentMethod('card'); }}
+                >
+                  <div className="co-method-icon">
+                    <span className="material-symbols-outlined">credit_card</span>
+                  </div>
+                  <div className="co-method-info">
+                    <h4 className="co-method-title">Credit / Debit Card</h4>
+                    <p className="co-method-sub">Visa, Mastercard, Amex</p>
+                  </div>
+                  {paymentMethod === 'card' && (
+                    <span className="material-symbols-outlined co-check-icon">check_circle</span>
+                  )}
                 </div>
-                <div className="co-method-info">
-                  <h4 className="co-method-title">Credit / Debit Card</h4>
-                  <p className="co-method-sub">Visa, Mastercard, Amex</p>
-                </div>
-                {paymentMethod === 'card' && (
-                  <span className="material-symbols-outlined co-check-icon">check_circle</span>
-                )}
-              </div>
 
-              {/* UPI Option */}
-              <div 
-                className={`co-method-row ${paymentMethod === 'upi' ? 'selected' : ''}`}
-                onClick={() => { mediumTap(); setPaymentMethod('upi'); setErrorMessage(''); }}
-              >
-                <div className="co-method-icon">
-                  <span className="material-symbols-outlined">qr_code_scanner</span>
+                {/* UPI Option */}
+                <div 
+                  className={`co-method-row ${paymentMethod === 'upi' ? 'selected' : ''}`}
+                  onClick={() => { mediumTap(); setPaymentMethod('upi'); setErrorMessage(''); }}
+                >
+                  <div className="co-method-icon">
+                    <span className="material-symbols-outlined">qr_code_scanner</span>
+                  </div>
+                  <div className="co-method-info">
+                    <h4 className="co-method-title">UPI / QR Scanner</h4>
+                    <p className="co-method-sub">Instant app-to-app payment</p>
+                  </div>
+                  {paymentMethod === 'upi' && (
+                    <span className="material-symbols-outlined co-check-icon">check_circle</span>
+                  )}
                 </div>
-                <div className="co-method-info">
-                  <h4 className="co-method-title">UPI / QR Scanner</h4>
-                  <p className="co-method-sub">Instant app-to-app payment</p>
-                </div>
-                {paymentMethod === 'upi' && (
-                  <span className="material-symbols-outlined co-check-icon">check_circle</span>
-                )}
-              </div>
 
-              {/* COD Option */}
-              <div 
-                className={`co-method-row ${paymentMethod === 'cod' ? 'selected' : ''}`}
-                onClick={() => { mediumTap(); setPaymentMethod('cod'); setErrorMessage(''); }}
-              >
-                <div className="co-method-icon">
-                  <span className="material-symbols-outlined">payments</span>
+                {/* COD Option */}
+                <div 
+                  className={`co-method-row ${paymentMethod === 'cod' ? 'selected' : ''}`}
+                  onClick={() => { mediumTap(); setPaymentMethod('cod'); setErrorMessage(''); }}
+                >
+                  <div className="co-method-icon">
+                    <span className="material-symbols-outlined">payments</span>
+                  </div>
+                  <div className="co-method-info">
+                    <h4 className="co-method-title">Cash on Delivery</h4>
+                    <p className="co-method-sub">Pay when your food arrives</p>
+                  </div>
+                  {paymentMethod === 'cod' && (
+                    <span className="material-symbols-outlined co-check-icon">check_circle</span>
+                  )}
                 </div>
-                <div className="co-method-info">
-                  <h4 className="co-method-title">Cash on Delivery</h4>
-                  <p className="co-method-sub">Pay when your food arrives</p>
-                </div>
-                {paymentMethod === 'cod' && (
-                  <span className="material-symbols-outlined co-check-icon">check_circle</span>
-                )}
               </div>
-            </div>
+            ) : (
+              <div className="co-section">
+                <div className="co-method-row selected" style={{ pointerEvents: 'none' }}>
+                  <div className="co-method-icon" style={{ background: '#e6ffe6', color: '#00B894' }}>
+                    <span className="material-symbols-outlined">account_balance_wallet</span>
+                  </div>
+                  <div className="co-method-info">
+                    <h4 className="co-method-title" style={{ color: '#00B894' }}>Paid by Wallet</h4>
+                    <p className="co-method-sub">Your wallet balance covers the full amount</p>
+                  </div>
+                  <span className="material-symbols-outlined co-check-icon" style={{ color: '#00B894' }}>check_circle</span>
+                </div>
+              </div>
+            )}
 
             {/* ─── Trust Badges ─── */}
             <div className="co-trust">

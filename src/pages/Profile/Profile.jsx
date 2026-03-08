@@ -33,6 +33,7 @@ const Profile = () => {
   
   const [totalOrdersCount, setTotalOrdersCount] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  const [walletBalance, setWalletBalance] = useState(0);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -148,7 +149,31 @@ const Profile = () => {
         setLoadingDeliveries(false);
       }
     };
-    fetchOrders();
+    fetchOrders().then(() => {
+      // Merge Wallet Transactions
+      const walletTxnsRaw = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
+      const totalBalance = walletTxnsRaw.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+      setWalletBalance(totalBalance);
+
+      if (walletTxnsRaw.length > 0) {
+         setTransactions(prevTxns => {
+            const walletTxns = walletTxnsRaw.map(wt => {
+              const amt = parseFloat(wt.amount);
+              const isCredit = amt >= 0;
+              return {
+                title: wt.description || 'Added to Wallet',
+                date: new Date(wt.date).toLocaleDateString(),
+                amount: `${isCredit ? '+' : '-'}$${Math.abs(amt).toFixed(2)}`,
+                type: isCredit ? 'credit' : 'debit',
+                icon: isCredit ? 'account_balance_wallet' : 'shopping_bag',
+                tag: 'Wallet'
+              };
+            });
+            const allTxns = [...prevTxns, ...walletTxns].sort((a, b) => new Date(b.date) - new Date(a.date));
+            return allTxns.slice(0, 4);
+         });
+      }
+    });
   }, []);
 
   const handleLogout = async () => {
@@ -168,7 +193,7 @@ const Profile = () => {
   const dynamicStats = [
     { label: 'Total Orders', value: totalOrdersCount.toString(), icon: 'local_mall', color: 'indigo', action: null },
     { label: 'Favorites', value: '12', icon: 'favorite', color: 'red', action: null },
-    { label: 'Wallet', value: '$0.00', icon: 'account_balance_wallet', color: 'orange', action: () => { mediumTap(); navigate('/customerwallet'); } },
+    { label: 'Wallet', value: `$${walletBalance.toFixed(2)}`, icon: 'account_balance_wallet', color: 'orange', action: () => { mediumTap(); navigate('/customerwallet'); } },
   ];
 
   return (
@@ -283,7 +308,12 @@ const Profile = () => {
                     <span className="material-symbols-outlined">{tx.icon}</span>
                   </div>
                   <div className="tx-info">
-                    <h4>{tx.title}</h4>
+                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {tx.title}
+                      {tx.tag === 'Wallet' && (
+                         <span style={{ fontSize: '10px', background: '#fb7e18', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>Wallet</span>
+                      )}
+                    </h4>
                     <p>{tx.date}</p>
                   </div>
                   <div className={`tx-amount ${tx.type === 'credit' ? 'tx-amount-green' : ''}`}>
