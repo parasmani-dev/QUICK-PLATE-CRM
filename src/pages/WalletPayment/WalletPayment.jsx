@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import useHaptic from '../../hooks/useHaptic';
+import { getStoredUser } from '../../services/firebase';
 import './WalletPayment.css';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const isMockMode = !API_BASE_URL;
 
 const WalletPayment = () => {
   const navigate = useNavigate();
@@ -36,7 +41,7 @@ const WalletPayment = () => {
     if (value.length <= 3) setCvv(value);
   };
 
-  const handlePayment = (e) => {
+  const handlePayment = async (e) => {
     e.preventDefault();
     if (!amount || !cardNo || !expiry || !cvv || !name) {
       lightTap();
@@ -46,13 +51,36 @@ const WalletPayment = () => {
     mediumTap();
     setIsProcessing(true);
 
-    setTimeout(() => {
+    try {
+      const numAmount = parseFloat(amount);
+      const storedUser = getStoredUser();
+
+      if (!isMockMode) {
+        if (!storedUser?.customerId) {
+          throw new Error('User session expired. Please login again.');
+        }
+
+        await axios.post(
+          `${API_BASE_URL}/services/apexrest/wallet/add-funds`,
+          {
+            customerId: storedUser.customerId,
+            amount: numAmount
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+      } else {
+        await new Promise(r => setTimeout(r, 2500));
+      }
+
       setIsProcessing(false);
       setIsSuccess(true);
       heavyTap();
 
       // Save Transaction
-      const numAmount = parseFloat(amount);
       const newTxn = {
         id: 'WTX-' + Math.floor(100000 + Math.random() * 900000),
         amount: numAmount,
@@ -67,7 +95,11 @@ const WalletPayment = () => {
       setTimeout(() => {
         navigate('/customerwallet', { replace: true });
       }, 2000);
-    }, 2500);
+    } catch (err) {
+      console.error('Add Funds Error:', err);
+      setIsProcessing(false);
+      alert(err.message || 'Failed to add funds to wallet.');
+    }
   };
 
   return (
