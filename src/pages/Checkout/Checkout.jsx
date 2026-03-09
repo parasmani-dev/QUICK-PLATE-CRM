@@ -41,9 +41,34 @@ const CheckoutForm = () => {
   const subtotal = getCartTotal();
   const deliveryFee = 0; // FREE
   
-  // Calculate Wallet Balance dynamically
-  const walletTxns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
-  const walletBalance = walletTxns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [isLoadingWallet, setIsLoadingWallet] = useState(true);
+
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      try {
+        if (!isMockMode && storedUser?.customerId) {
+          const response = await axios.get(
+            `${API_BASE_URL}/services/apexrest/wallet/balance?customerId=${storedUser.customerId}`
+          );
+          if (response.data && response.data.success) {
+            setWalletBalance(response.data.availableBalance || 0);
+          }
+        } else {
+          const walletTxns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
+          setWalletBalance(walletTxns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0));
+        }
+      } catch (err) {
+        console.error('Wallet balance fetch failed', err);
+      } finally {
+        setIsLoadingWallet(false);
+      }
+    };
+    fetchWalletBalance();
+    
+    const interval = setInterval(fetchWalletBalance, 5000);
+    return () => clearInterval(interval);
+  }, []);
   
   // Max we can apply is the subtotal + deliveryFee + taxes (calculated without wallet first)
   const taxesPreWallet = subtotal > 0 ? 4.50 : 0;
@@ -190,7 +215,7 @@ const CheckoutForm = () => {
     <div className="checkout-content">
       {/* ─── State Modals ─── */}
       <AnimatePresence mode="wait">
-        {(uiState === UI_STATES.WAITING || uiState === UI_STATES.SUCCESS || uiState === UI_STATES.FAILED) && (
+        {(uiState === UI_STATES.WAITING || uiState === UI_STATES.SUCCESS || uiState === UI_STATES.FAILED || isLoadingWallet) && (
           <motion.div 
             className="checkout-state-overlay"
             initial={{ opacity: 0, y: 20 }}
@@ -198,7 +223,15 @@ const CheckoutForm = () => {
             exit={{ opacity: 0, scale: 0.9 }}
             key="state-overlay"
           >
-            {uiState === UI_STATES.WAITING && (
+            {isLoadingWallet && uiState !== UI_STATES.SUCCESS && uiState !== UI_STATES.FAILED && uiState !== UI_STATES.WAITING && (
+              <>
+                <div className="spinner dark state-icon-large pulsing" style={{ borderTopColor: 'var(--color-primary)', width: '60px', height: '60px' }} />
+                <h3 className="checkout-state-title">Loading Security Layer...</h3>
+                <p className="checkout-state-desc">Fetching encrypted details.</p>
+              </>
+            )}
+
+            {uiState === UI_STATES.WAITING && !isLoadingWallet && (
               <>
                 <div className="spinner dark state-icon-large pulsing" style={{ borderTopColor: 'var(--color-primary)', width: '60px', height: '60px' }} />
                 <h3 className="checkout-state-title">Confirming your order...</h3>

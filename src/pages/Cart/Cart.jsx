@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -18,6 +18,8 @@ const Cart = () => {
   const navigate = useNavigate();
   const [useWallet, setUseWallet] = useState(true);
   const [isLoading, setLoading] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [isWalletLoading, setWalletLoading] = useState(true);
 
   // Dynamic Addons from Current Restaurant Mapping Context 
   const restData = cartRestaurant || { name: cartRestaurantId || "L'Artisan Bistro" };
@@ -34,11 +36,42 @@ const Cart = () => {
   const deliveryFee = 0; // FREE in mockup
   const taxes = subtotal > 0 ? 4.50 : 0;
 
-  // Calculate Wallet Balance dynamically
-  const walletTxns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
-  const walletBalance = walletTxns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
-  const maxApplicableWallet = Math.min(walletBalance, subtotal + deliveryFee + taxes);
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      try {
+        const storedUser = getStoredUser();
+        if (!storedUser?.customerId) return;
+        
+        if (!API_BASE_URL) {
+          const walletTxns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
+          setWalletBalance(walletTxns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0));
+          return;
+        }
 
+        const response = await axios.get(
+          `${API_BASE_URL}/services/apexrest/wallet/balance?customerId=${storedUser.customerId}`
+        );
+        
+        if (response.data && response.data.success) {
+          setWalletBalance(response.data.availableBalance || 0);
+        } else {
+          console.warn('Backend responded with failure for wallet balance');
+        }
+      } catch (err) {
+        console.error('Failed to fetch wallet balance', err);
+      } finally {
+        setWalletLoading(false);
+      }
+    };
+
+    fetchWalletBalance();
+    
+    // Poll every 5 seconds for frequent updates on cart page
+    const interval = setInterval(fetchWalletBalance, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const maxApplicableWallet = Math.min(walletBalance, subtotal + deliveryFee + taxes);
   const walletApplied = useWallet && subtotal > 0 ? maxApplicableWallet : 0;
   const totalPay = subtotal + deliveryFee + taxes - walletApplied;
 

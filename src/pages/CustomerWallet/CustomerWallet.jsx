@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import useHaptic from '../../hooks/useHaptic';
+import { getStoredUser } from '../../services/firebase';
 import './CustomerWallet.css';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const isMockMode = !API_BASE_URL;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -20,29 +25,50 @@ const CustomerWallet = () => {
   const [balance, setBalance] = useState(0);
 
   useEffect(() => {
-    const loadWalletData = () => {
+    const loadWalletData = async () => {
+      // Local Storage Transactions
       const txns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
-      
-      // Filter only for Credit Transactions (Wallet Top-up) and using amount to purchase (Order Deduct)
-      // Including old formats just in case they don't have types yet
       const validTxns = txns.filter(tx => {
         const amt = parseFloat(tx.amount) || 0;
         return (amt > 0 && (tx.type === 'Wallet' || !tx.type)) || 
                (amt < 0 && (tx.type === 'Order Deduct' || tx.description?.toLowerCase().includes('order')));
       });
-      
       setTransactions(validTxns);
-      const currentBalance = validTxns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
-      setBalance(currentBalance);
+
+      // Wallet Balance (Backend Source of Truth)
+      const storedUser = getStoredUser();
+      
+      if (!isMockMode && storedUser && storedUser.customerId) {
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/services/apexrest/wallet/balance?customerId=${storedUser.customerId}`
+          );
+          if (response.data && response.data.success) {
+            setBalance(response.data.availableBalance || 0);
+          } else {
+            console.warn('Backend returned success: false for balance', response.data);
+          }
+        } catch (err) {
+          console.error('Error fetching wallet balance:', err);
+        }
+      } else {
+        // Fallback for Mock Mode
+        const currentBalance = validTxns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+        setBalance(currentBalance);
+      }
     };
 
     loadWalletData();
     window.addEventListener('storage', loadWalletData);
     window.addEventListener('focus', loadWalletData);
     
+    // Poll every 5 seconds 
+    const intervalId = setInterval(loadWalletData, 5000);
+    
     return () => {
       window.removeEventListener('storage', loadWalletData);
       window.removeEventListener('focus', loadWalletData);
+      clearInterval(intervalId);
     };
   }, []);
 

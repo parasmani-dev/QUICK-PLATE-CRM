@@ -149,10 +149,29 @@ const Profile = () => {
         setLoadingDeliveries(false);
       }
     };
-    fetchOrders().then(() => {
-      // Merge Wallet Transactions
+    fetchOrders().then(async () => {
+      // Wallet Balance (Backend Source of Truth)
+      const storedUser = JSON.parse(localStorage.getItem('quickplate_user') || '{}');
+      
+      let totalBalance = 0;
+      if (!isMockMode && storedUser && storedUser.customerId) {
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/services/apexrest/wallet/balance?customerId=${storedUser.customerId}`
+          );
+          if (response.data && response.data.success) {
+            totalBalance = response.data.availableBalance || 0;
+          }
+        } catch (err) {
+          console.error('Error fetching wallet balance:', err);
+        }
+      }
+
+      // Merge Wallet Transactions (Fallback balance for mock mode)
       const walletTxnsRaw = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
-      const totalBalance = walletTxnsRaw.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+      if (isMockMode || !storedUser?.customerId) {
+        totalBalance = walletTxnsRaw.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+      }
       setWalletBalance(totalBalance);
 
       if (walletTxnsRaw.length > 0) {
