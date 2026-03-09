@@ -66,6 +66,7 @@ const Cart = () => {
       console.log('Customer ID:', storedUser.customerId);
       console.log('Restaurant ID:', restData.id);
       console.log('Order Total:', cartTotal);
+      console.log('Credits Used:', walletApplied);
 
       // Create Order at Salesforce Back-End
       const response = await axios.post(
@@ -73,7 +74,8 @@ const Cart = () => {
         {
           customerId: storedUser.customerId,
           restaurantId: restData.id, 
-          orderTotal: Number(cartTotal)
+          orderTotal: Number(cartTotal),
+          Credits_used: Number(walletApplied)
         },
         {
           headers: {
