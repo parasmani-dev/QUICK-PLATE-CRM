@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useHaptic from '../../hooks/useHaptic';
@@ -16,12 +16,35 @@ const CustomerWallet = () => {
   const navigate = useNavigate();
   const { lightTap, mediumTap } = useHaptic();
   
-  const [transactions] = useState(() => JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]'));
-  
-  const [balance] = useState(() => {
-    const txns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
-    return txns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
-  });
+  const [transactions, setTransactions] = useState([]);
+  const [balance, setBalance] = useState(0);
+
+  useEffect(() => {
+    const loadWalletData = () => {
+      const txns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
+      
+      // Filter only for Credit Transactions (Wallet Top-up) and using amount to purchase (Order Deduct)
+      // Including old formats just in case they don't have types yet
+      const validTxns = txns.filter(tx => {
+        const amt = parseFloat(tx.amount) || 0;
+        return (amt > 0 && (tx.type === 'Wallet' || !tx.type)) || 
+               (amt < 0 && (tx.type === 'Order Deduct' || tx.description?.toLowerCase().includes('order')));
+      });
+      
+      setTransactions(validTxns);
+      const currentBalance = validTxns.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+      setBalance(currentBalance);
+    };
+
+    loadWalletData();
+    window.addEventListener('storage', loadWalletData);
+    window.addEventListener('focus', loadWalletData);
+    
+    return () => {
+      window.removeEventListener('storage', loadWalletData);
+      window.removeEventListener('focus', loadWalletData);
+    };
+  }, []);
 
   return (
     <div className="wallet-page">
@@ -92,8 +115,12 @@ const CustomerWallet = () => {
                     <span className="material-symbols-outlined">{parseFloat(tx.amount) >= 0 ? 'add_card' : 'shopping_bag'}</span>
                   </div>
                   <div className="txn-details" style={{ flex: 1 }}>
-                    <h4 style={{ margin: 0, fontSize: '14px', color: '#1a202c' }}>{tx.description || 'Added to Wallet'}</h4>
-                    <span style={{ fontSize: '12px', color: '#718096' }}>{new Date(tx.date).toLocaleDateString()}</span>
+                    <h4 style={{ margin: 0, fontSize: '14px', color: '#1a202c' }}>
+                      {parseFloat(tx.amount) >= 0 ? (tx.description || 'Added to Wallet') : (tx.description || 'Used for Order')}
+                    </h4>
+                    <span style={{ fontSize: '12px', color: '#718096' }}>
+                      {parseFloat(tx.amount) >= 0 ? 'Credit Transaction' : 'Debit Transaction'} • {new Date(tx.date).toLocaleDateString()}
+                    </span>
                   </div>
                   <div className="txn-amount" style={{ fontSize: '14px', fontWeight: 'bold', color: parseFloat(tx.amount) >= 0 ? '#00B894' : '#FF7675' }}>
                     {parseFloat(tx.amount) >= 0 ? '+' : '-'}${Math.abs(parseFloat(tx.amount)).toFixed(2)}
