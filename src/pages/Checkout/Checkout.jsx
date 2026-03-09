@@ -79,25 +79,15 @@ const CheckoutForm = () => {
           await new Promise(r => setTimeout(r, 2000));
           isPaid = true;
         } else {
-          const response = await axios.get(`${API_BASE_URL}/orders/${orderId}`);
-          if (response.data.Order_Status === 'PAID') isPaid = true;
+          const response = await axios.get(`${API_BASE_URL}/services/apexrest/order/status/${orderId}`);
+          if (response.data && ['PAID', 'PLACED', 'ASSIGNED', 'CONFIRMED'].includes(response.data.orderStatus)) {
+            isPaid = true;
+          }
         }
 
         if (isPaid) {
           clearInterval(pollingTimerRef.current);
           successTap();
-
-          if (walletApplied > 0) {
-            const txns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
-            txns.unshift({
-               id: 'WTX-' + Math.floor(100000 + Math.random() * 900000),
-               amount: -walletApplied,
-               date: new Date().toISOString(),
-               type: 'Order Deduct',
-               description: 'Payment for order ' + orderId
-            });
-            localStorage.setItem('quickplate_wallet_txns', JSON.stringify(txns));
-          }
 
           setUiState(UI_STATES.SUCCESS);
           
@@ -134,6 +124,24 @@ const CheckoutForm = () => {
       
       if (!orderId) {
         throw new Error('Order tracking ID is missing. Please initiate from the cart.');
+      }
+
+      // Deduct Wallet Balance Immediately upon purchase logic trigger
+      if (walletApplied > 0) {
+        const txns = JSON.parse(localStorage.getItem('quickplate_wallet_txns') || '[]');
+        // ensure we don't deduct twice for same order
+        const alreadyDeducted = txns.some(t => t.description === 'Payment for order ' + orderId);
+        if (!alreadyDeducted) {
+          txns.unshift({
+             id: 'WTX-' + Math.floor(100000 + Math.random() * 900000),
+             amount: -walletApplied,
+             date: new Date().toISOString(),
+             type: 'Order Deduct',
+             description: 'Payment for order ' + orderId
+          });
+          localStorage.setItem('quickplate_wallet_txns', JSON.stringify(txns));
+          window.dispatchEvent(new Event('storage')); // Alert other listeners
+        }
       }
 
       if (totalPayCents === 0) {
