@@ -75,7 +75,7 @@ const Cart = () => {
           customerId: storedUser.customerId,
           restaurantId: restData.id, 
           orderTotal: Number(cartTotal),
-          Credits_used: Number(walletApplied)
+          creditsUsed: Number(walletApplied)
         },
         {
           headers: {
