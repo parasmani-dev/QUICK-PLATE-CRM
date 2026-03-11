@@ -38,13 +38,20 @@ const CheckoutForm = () => {
   const [paymentMethod, setPaymentMethod] = useState('card'); // 'card', 'upi', 'cod'
   
   // Calculated Totals
-  const subtotal = getCartTotal();
+  const subtotal = location.state?.computedSubtotal ?? getCartTotal();
   const deliveryFee = 0; // FREE
   
   const [walletBalance, setWalletBalance] = useState(0);
-  const [isLoadingWallet, setIsLoadingWallet] = useState(true);
+  const [isLoadingWallet, setIsLoadingWallet] = useState(
+    location.state?.computedWalletApplied !== undefined ? false : true
+  );
 
   useEffect(() => {
+    // If we received pre-computed wallet amounts from Cart, skip polling
+    if (location.state?.computedWalletApplied !== undefined) {
+      return;
+    }
+
     const fetchWalletBalance = async () => {
       try {
         if (!isMockMode && storedUser?.customerId) {
@@ -68,17 +75,19 @@ const CheckoutForm = () => {
     
     const interval = setInterval(fetchWalletBalance, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [location.state?.computedWalletApplied]);
   
   // Max we can apply is the subtotal + deliveryFee + taxes (calculated without wallet first)
-  const taxesPreWallet = subtotal > 0 ? 4.50 : 0;
+  const taxesPreWallet = location.state?.computedTaxes ?? (subtotal > 0 ? 4.50 : 0);
   const maxApplicableWallet = Math.min(walletBalance, subtotal + deliveryFee + taxesPreWallet);
   
   const useWallet = location.state?.useWallet !== false; // default true if missing
-  const walletApplied = useWallet ? maxApplicableWallet : 0;
+  const walletApplied = location.state?.computedWalletApplied ?? (useWallet ? maxApplicableWallet : 0);
 
   const taxes = taxesPreWallet;
-  const totalPayStr = Math.max(0, subtotal > 0 ? subtotal + deliveryFee + taxes - walletApplied : 0).toFixed(2);
+  const totalPayStr = location.state?.computedTotalPay !== undefined 
+    ? location.state.computedTotalPay.toFixed(2) 
+    : Math.max(0, subtotal > 0 ? subtotal + deliveryFee + taxes - walletApplied : 0).toFixed(2);
   const totalPayCents = Math.round(parseFloat(totalPayStr) * 100);
 
   const pollingTimerRef = useRef(null);

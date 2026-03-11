@@ -125,7 +125,16 @@ const Cart = () => {
       const orderId = response.data.orderId;
       console.log('Order Created Successfully:', orderId);
 
-      navigate('/checkout', { state: { orderId, useWallet } });
+      navigate('/checkout', { 
+        state: { 
+          orderId, 
+          useWallet,
+          computedWalletApplied: walletApplied,
+          computedSubtotal: subtotal,
+          computedTaxes: taxes,
+          computedTotalPay: totalPay
+        } 
+      });
 
     } catch (error) {
       console.error('Order Creation Error:', error);
