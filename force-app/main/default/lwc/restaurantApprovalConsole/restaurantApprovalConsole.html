@@ -1,0 +1,146 @@
+<template>
+    <div class="app-container">
+        <!-- Top Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <lightning-icon icon-name="custom:custom33" size="medium" alternative-text="Restaurant"></lightning-icon>
+                </div>
+                <div class="header-text">
+                    <h1>Restaurant Approval Console</h1>
+                    <p>Manage incoming restaurant onboarding requests</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Layout -->
+        <div class="main-layout">
+            
+            <!-- Left Panel: Pending Requests -->
+            <section class="left-panel">
+                <div class="panel-header">
+                    <h2>Pending Restaurants</h2>
+                    <span class="count-badge" if:true={requests}>{requests.length}</span>
+                </div>
+                
+                <div class="list-container">
+                    <template if:true={isLoading}>
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </template>
+                    
+                    <template if:true={requests}>
+                        <template for:each={requests} for:item="req">
+                            <div key={req.restaurantId} 
+                                 class={req.cardClass} 
+                                 onclick={handleSelectRequest} 
+                                 data-id={req.restaurantId}>
+                                <div class="card-header">
+                                    <h3 class="rest-name">{req.restaurantName}</h3>
+                                    <span class="status-badge status-pending">
+                                        <lightning-icon icon-name="utility:record" size="xx-small" class="dot-icon"></lightning-icon>
+                                        {req.status}
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="owner-name">
+                                        <lightning-icon icon-name="utility:user" size="xx-small"></lightning-icon>
+                                        {req.ownerName}
+                                    </p>
+                                    <p class="location">
+                                        <lightning-icon icon-name="utility:checkin" size="xx-small"></lightning-icon>
+                                        {req.city}
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+                        
+                        <template if:true={isListEmpty}>
+                            <div class="empty-state">
+                                <lightning-icon icon-name="utility:check" size="large" class="success-icon"></lightning-icon>
+                                <p>All caught up!</p>
+                                <span>No pending approvals.</span>
+                            </div>
+                        </template>
+                    </template>
+                    
+                    <template if:true={error}>
+                        <div class="error-msg">{error}</div>
+                    </template>
+                </div>
+            </section>
+
+            <!-- Right Panel: Details View -->
+            <section class="right-panel">
+                <template if:true={selectedRequest}>
+                    <div class="details-card">
+                        <div class="details-header">
+                            <h2>Restaurant Details</h2>
+                            <span class="status-badge status-pending">{selectedRequest.status}</span>
+                        </div>
+                        
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <span class="label">Name</span>
+                                <span class="value">{selectedRequest.restaurantName}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Owner</span>
+                                <span class="value">{selectedRequest.ownerName}</span>
+                            </div>
+                            <div class="detail-item full-width">
+                                <span class="label">Address</span>
+                                <span class="value">{selectedRequest.address}</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <span class="label">Avg Prep Time (Min)</span>
+                                <span class="value">{selectedRequest.avgPrepTime}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Prep Time Risk Level</span>
+                                <span class="value">{selectedRequest.prepTimeRiskLevel}</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <span class="label">Created Date</span>
+                                <span class="value"><lightning-formatted-date-time value={selectedRequest.createdDate} year="numeric" month="short" day="2-digit" hour="2-digit" minute="2-digit"></lightning-formatted-date-time></span>
+                            </div>
+                        </div>
+
+                        <div class="action-section">
+                            <lightning-textarea 
+                                label="Approval Notes" 
+                                placeholder="Add your notes here before approving or rejecting..." 
+                                value={comments} 
+                                onchange={handleCommentChange}
+                                required>
+                            </lightning-textarea>
+                            
+                            <div class="button-group">
+                                <button class="btn btn-reject" onclick={handleReject} disabled={isActionDisabled}>
+                                    <lightning-icon icon-name="utility:close" size="x-small" variant="inverse"></lightning-icon>
+                                    Reject
+                                </button>
+                                <button class="btn btn-approve" onclick={handleApprove} disabled={isActionDisabled}>
+                                    <lightning-icon icon-name="utility:check" size="x-small" variant="inverse"></lightning-icon>
+                                    Approve
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <template if:true={isActionLoading}>
+                            <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
+                        </template>
+                    </div>
+                </template>
+                
+                <template if:false={selectedRequest}>
+                    <div class="empty-state-details">
+                        <lightning-icon icon-name="utility:touch_action" size="large"></lightning-icon>
+                        <p>Select a restaurant to view details</p>
+                    </div>
+                </template>
+            </section>
+        </div>
+    </div>
+</template>

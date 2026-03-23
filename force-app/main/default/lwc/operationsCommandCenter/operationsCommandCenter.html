@@ -1,0 +1,189 @@
+<template>
+    <div class="cmd-center">
+        <!-- HEADER -->
+        <header class="cmd-header fade-in">
+            <div class="header-icon">
+                <lightning-icon icon-name="custom:custom62" size="medium" alternative-text="Command Center"></lightning-icon>
+            </div>
+            <div class="header-text">
+                <h1>Operations Command Center</h1>
+                <p>Live visibility across Support, Finance, and Restaurant Operations</p>
+            </div>
+            <div class="header-action">
+                <lightning-button-icon icon-name="utility:refresh" variant="border-filled" alternative-text="Refresh Metrics" onclick={refreshData}></lightning-button-icon>
+            </div>
+        </header>
+
+        <template if:true={isLoading}>
+            <div class="spinner-container">
+                <lightning-spinner alternative-text="Loading Metrics..." size="large"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:true={data}>
+            <!-- SECTION 1: KPI CARDS (Top Row) -->
+            <section class="section-kpis fade-in-up delay-1">
+                <div class="kpi-card card-blue">
+                    <div class="kpi-icon">
+                        <lightning-icon icon-name="utility:ticket" size="medium" variant="inverse"></lightning-icon>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Tickets Resolved</span>
+                        <span class="kpi-value">{data.kpiTicketsResolved}</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card card-red">
+                    <div class="kpi-icon">
+                        <lightning-icon icon-name="utility:currency" size="medium" variant="inverse"></lightning-icon>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Refund Amount</span>
+                        <span class="kpi-value">
+                            <lightning-formatted-number value={data.kpiRefundAmount} format-style="currency" currency-code="INR" maximum-fraction-digits="0"></lightning-formatted-number>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="kpi-card card-purple">
+                    <div class="kpi-icon">
+                        <lightning-icon icon-name="utility:retail" size="medium" variant="inverse"></lightning-icon>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">New Restaurants</span>
+                        <span class="kpi-value">{data.kpiNewRestaurants}</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card card-orange">
+                    <div class="kpi-icon">
+                        <lightning-icon icon-name="utility:delivery" size="medium" variant="inverse"></lightning-icon>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Active Orders</span>
+                        <span class="kpi-value">{data.kpiActiveOrders}</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MIDDLE SECTIONS -->
+            <div class="dashboard-grid fade-in-up delay-2">
+                
+                <!-- ALERTS PANEL -->
+                <section class="panel alerts-panel">
+                    <h2>
+                        <div class="panel-title-group">
+                            <lightning-icon icon-name="utility:warning" size="small" class="alert-icon"></lightning-icon>
+                            Operational Alerts
+                        </div>
+                    </h2>
+                    <ul class="alert-list">
+                        <template for:each={data.operationalAlerts} for:item="alert">
+                            <li key={alert} class="alert-item">
+                                <span class="alert-bullet"></span>
+                                {alert}
+                            </li>
+                        </template>
+                    </ul>
+                </section>
+
+                <div class="metrics-row">
+                    <!-- SECTION 2: SUPPORT PERFORMANCE -->
+                    <section class="panel data-panel">
+                        <h2>
+                            <div class="panel-title-group">
+                                <lightning-icon icon-name="utility:call" size="small" class="primary-icon"></lightning-icon>
+                                Support Analytics
+                            </div>
+                        </h2>
+                        <div class="metric-container">
+                            <div class="metric-row">
+                                <span class="m-label">Tickets Created <small>(Week)</small></span>
+                                <span class="m-value">{data.supportTicketsCreatedThisWeek}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="m-label">Tickets Resolved <small>(Week)</small></span>
+                                <span class="m-value success">{data.supportTicketsResolvedThisWeek}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="m-label">Avg Res Time</span>
+                                <span class="m-value info">{data.supportAvgResolutionTime}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="m-label">Pending Tickets</span>
+                                <span class="m-value warning">{data.supportPendingTickets}</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- SECTION 3: FINANCE IMPACT -->
+                    <section class="panel data-panel">
+                        <h2>
+                            <div class="panel-title-group">
+                                <lightning-icon icon-name="utility:moneybag" size="small" class="primary-icon"></lightning-icon>
+                                Financial Impact
+                            </div>
+                        </h2>
+                        <div class="metric-container">
+                            <div class="metric-row">
+                                <span class="m-label">Refunds Approved</span>
+                                <span class="m-value warning">{data.financeRefundsApproved}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="m-label">Total Refund Amt</span>
+                                <span class="m-value danger">
+                                    <lightning-formatted-number value={data.financeTotalRefundAmount} format-style="currency" currency-code="INR" maximum-fraction-digits="0"></lightning-formatted-number>
+                                </span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="m-label">Successful Payments</span>
+                                <span class="m-value success">{data.financePaymentCount}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="m-label">Failed Payments</span>
+                                <span class="m-value danger">{data.financeFailedPayments}</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- SECTION 4: RESTAURANT ONBOARDING -->
+                    <section class="panel data-panel">
+                        <h2>
+                            <div class="panel-title-group">
+                                <lightning-icon icon-name="utility:company" size="small" class="primary-icon"></lightning-icon>
+                                Restaurant Growth
+                            </div>
+                        </h2>
+                        <div class="metric-container">
+                            <div class="metric-row">
+                                <span class="m-label">New Signups <small>(Week)</small></span>
+                                <span class="m-value info">{data.restNewWeekly}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="m-label">Pending Approvals</span>
+                                <span class="m-value warning">{data.restPendingApprovals}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="m-label">Total Approved</span>
+                                <span class="m-value success">{data.restApproved}</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="m-label">Total Suspended/Rejected</span>
+                                <span class="m-value danger">{data.restRejected}</span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </template>
+        
+        <template if:true={error}>
+            <div class="error-panel fade-in">
+                <lightning-icon icon-name="utility:error" size="large" variant="error"></lightning-icon>
+                <h3>Unable to load Command Center</h3>
+                <p>{error}</p>
+                <lightning-button label="Retry" variant="brand" onclick={refreshData} class="slds-m-top_medium"></lightning-button>
+            </div>
+        </template>
+    </div>
+</template>
