@@ -1,0 +1,200 @@
+.kanban-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 1rem;
+    gap: 1.5rem;
+    background: #f4f6f9;
+    border-radius: 12px;
+    align-items: stretch; /* Stretch columns to be equal height */
+}
+
+.kanban-column {
+    flex: 0 0 320px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    height: 65vh; /* Fixed view height to force inner scrolling */
+    min-height: 400px;
+    max-height: 750px;
+}
+
+.kanban-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #eef0f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    border-radius: 12px 12px 0 0;
+    flex-shrink: 0; /* Important: prevents header from shrinking */
+}
+
+.stage-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333d47;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge {
+    background-color: #0070d2;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.kanban-cards {
+    padding: 1rem;
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #fcfcfc;
+    border-radius: 0 0 12px 12px;
+    /* Ensure height adapts securely inside flex column */
+    height: 0; /* Works with flex-grow to ensure inner scroll */
+}
+
+.kanban-card {
+    background: white;
+    border: 1px solid #eef0f5;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease-in-out;
+    cursor: grab;
+    position: relative;
+    border-left: 4px solid #0070d2;
+}
+
+.kanban-card:active {
+    cursor: grabbing;
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kanban-card[draggable="false"] {
+    cursor: default;
+    border-left-color: #9ba2ab;
+    opacity: 0.85;
+}
+
+.kanban-card[draggable="false"]:hover {
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.order-number {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #1a1a1a;
+}
+
+.sla-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+.sla-safe {
+    background-color: #e5f5ec;
+    color: #0b7a42;
+}
+
+.sla-risk {
+    background-color: #fff4e5;
+    color: #d76e00;
+}
+
+.sla-breached {
+    background-color: #feeceb;
+    color: #c23934;
+}
+
+.card-body {
+    margin-bottom: 1rem;
+}
+
+.card-detail {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: #4a4a4a;
+}
+
+.card-detail strong {
+    color: #706e6b;
+    font-weight: 600;
+    margin-right: 0.25rem;
+}
+
+.card-detail.total {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: #0070d2;
+    font-weight: 700;
+}
+
+.card-detail.total strong {
+    color: #333333;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f2f5;
+    padding-top: 0.75rem;
+}
+
+.created-time {
+    font-size: 0.8rem;
+    color: #9ba2ab;
+    display: flex;
+    align-items: center;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+}
+
+.no-orders {
+    text-align: center;
+    color: #b0adab;
+    font-style: italic;
+    padding: 2rem 0;
+}
+
+/* Scrollbar styling */
+.kanban-container::-webkit-scrollbar, .kanban-cards::-webkit-scrollbar {
+    height: 8px;
+    width: 6px;
+}
+.kanban-container::-webkit-scrollbar-track, .kanban-cards::-webkit-scrollbar-track {
+    background: transparent;
+}
+.kanban-container::-webkit-scrollbar-thumb, .kanban-cards::-webkit-scrollbar-thumb {
+    background: #d4d4d4;
+    border-radius: 4px;
+}
+.kanban-container::-webkit-scrollbar-thumb:hover, .kanban-cards::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+}

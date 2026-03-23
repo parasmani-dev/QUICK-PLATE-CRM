@@ -1,0 +1,70 @@
+<template>
+    <lightning-card title="Order Pipeline" icon-name="standard:orders">
+        <!-- Render UI only if user has the Operation_LWC_Components Custom Permission -->
+        <template if:true={hasDashboardAccess}>
+            <!-- Render Spinner when loading -->
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+            
+            <div class="kanban-container">
+                <template for:each={stages} for:item="stage">
+                    <div key={stage.value} class="kanban-column"
+                         data-stage-name={stage.value} 
+                         ondragover={handleDragOver} 
+                         ondrop={handleDrop}>
+                        
+                        <!-- Column Header -->
+                        <div class="kanban-header">
+                            <h2 class="stage-title">{stage.label}</h2>
+                            <span class="order-count badge">{stage.orders.length}</span>
+                        </div>
+
+                        <!-- Cards Container -->
+                        <div class="kanban-cards">
+                            <template for:each={stage.orders} for:item="order">
+                                <div key={order.id} class="kanban-card" 
+                                     draggable={order.draggable} 
+                                     data-id={order.id} 
+                                     ondragstart={handleDragStart}>
+                                    
+                                    <div class="card-header">
+                                        <div class="order-number">{order.orderNumber}</div>
+                                        <span class={order.slaClass}>{order.slaStatus}</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-detail"><strong>Customer:</strong> {order.customerName}</p>
+                                        <p class="card-detail"><strong>Restaurant:</strong> {order.restaurantName}</p>
+                                        <p class="card-detail"><strong>Agent:</strong> {order.deliveryAgentName}</p>
+                                        <p class="card-detail total"><strong>Total:</strong> ${order.orderTotal}</p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <span class="created-time"><lightning-icon icon-name="utility:clock" size="xx-small" class="slds-m-right_xxx-small"></lightning-icon>{order.createdTime}</span>
+                                        <div class="actions">
+                                            <lightning-button-icon icon-name="utility:preview" alternative-text="View Details" title="View Details" data-id={order.id} onclick={handleViewDetails} variant="bare"></lightning-button-icon>
+                                            <template if:true={order.canEdit}>
+                                                <lightning-button-icon icon-name="utility:edit" alternative-text="Edit / Assign Agent" title="Edit / Assign Agent" data-id={order.id} onclick={handleEditRecord} variant="bare" class="slds-m-left_x-small"></lightning-button-icon>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <!-- Note when there are no orders -->
+                            <template if:false={stage.orders.length}>
+                                <div class="no-orders">No orders</div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+        
+        <!-- Render alternative UI for unauthorized users -->
+        <template if:false={hasDashboardAccess}>
+            <div class="slds-p-around_medium slds-text-align_center slds-text-color_error">
+                <lightning-icon icon-name="utility:error" alternative-text="Error" variant="error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <strong>Access Denied:</strong> You do not have the required permissions to view this Operations Dashboard.
+            </div>
+        </template>
+    </lightning-card>
+</template>

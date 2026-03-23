@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+
+    <!-- Apex Classes -->
+    <types>
+        <members>CustomerProfileController</members>
+        <members>OrderController</members>
+        <members>SupportTicketController</members>
+        <members>RefundRequestEngine</members>
+        <members>OperationsDashboardController</members>
+        <name>ApexClass</name>
+    </types>
+
+    <!-- LWC Components -->
+    <types>
+        <members>liveOrdersMonitor</members>
+        <members>operationsDashboard</members>
+        <name>LightningComponentBundle</name>
+    </types>
+
+    <!-- Flows -->
+    <types>
+        <members>ORDER_CREATION_ENGINE</members>
+        <name>Flow</name>
+    </types>
+
+    <!-- Approval Processes -->
+    <types>
+        <members>Support_Ticket__c.*</members>
+        <members>Restaurant__c.*</members>
+        <name>ApprovalProcess</name>
+    </types>
+
+    <!-- Custom Objects -->
+    <types>
+        <members>Customer__c</members>
+        <members>Order__c</members>
+        <members>Restaurant__c</members>
+        <members>Delivery_Agent__c</members>
+        <members>Payment_Transaction__c</members>
+        <members>Support_Ticket__c</members>
+        <name>CustomObject</name>
+    </types>
+
+    <!-- Permission Sets -->
+    <types>
+        <members>QuickPlate_Delivery_Ops</members>
+        <members>QuickPlate_Finance_Team</members>
+        <members>QuickPlate_Operations_Team</members>
+        <members>QuickPlate_Restaurant_Manager</members>
+        <members>QuickPlate_Support_Agent</members>
+        <name>PermissionSet</name>
+    </types>
+
+    <!-- Queues -->
+    <types>
+        <members>Customer_Service_Queue</members>
+        <members>Operations_Approval_Queue</members>
+        <name>Group</name>
+    </types>
+
+    <!-- Triggers (if any later) -->
+    <types>
+        <members>*</members>
+        <name>ApexTrigger</name>
+    </types>
+
+    <!-- Static Resources -->
+    <types>
+        <members>*</members>
+        <name>StaticResource</name>
+    </types>
+
+    <!-- API Version -->
+    <version>66.0</version>
+
+</Package>
