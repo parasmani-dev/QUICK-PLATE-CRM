@@ -9,7 +9,7 @@
 }
 
 .dashboard-container {
-    max-width: 1400px;
+    width: 100%;
     margin: 0 auto;
 }
 
@@ -59,20 +59,20 @@
     align-items: center;
 }
 
-.kpi-card.total .kpi-icon-container { background: #e3f2fd; }
-.kpi-card.total .kpi-icon { --sds-c-icon-color-foreground: #1976d2; }
+.kpi-card.total .kpi-icon-container { background: #ffedd5; }
+.kpi-card.total .kpi-icon { --sds-c-icon-color-foreground: #ea580c; }
 
-.kpi-card.active .kpi-icon-container { background: #e8f5e9; }
-.kpi-card.active .kpi-icon { --sds-c-icon-color-foreground: #388e3c; }
+.kpi-card.active .kpi-icon-container { background: #fffaed; }
+.kpi-card.active .kpi-icon { --sds-c-icon-color-foreground: #f97316; }
 
-.kpi-card.inactive .kpi-icon-container { background: #f5f5f5; }
-.kpi-card.inactive .kpi-icon { --sds-c-icon-color-foreground: #757575; }
+.kpi-card.inactive .kpi-icon-container { background: #fff7ed; }
+.kpi-card.inactive .kpi-icon { --sds-c-icon-color-foreground: #fb923c; }
 
-.kpi-card.pending .kpi-icon-container { background: #fff8e1; }
-.kpi-card.pending .kpi-icon { --sds-c-icon-color-foreground: #ffa000; }
+.kpi-card.pending .kpi-icon-container { background: #fff3e0; }
+.kpi-card.pending .kpi-icon { --sds-c-icon-color-foreground: #f59e0b; }
 
-.kpi-card.issues .kpi-icon-container { background: #ffebee; }
-.kpi-card.issues .kpi-icon { --sds-c-icon-color-foreground: #d32f2f; }
+.kpi-card.issues .kpi-icon-container { background: #ffedd5; }
+.kpi-card.issues .kpi-icon { --sds-c-icon-color-foreground: #c2410c; }
 
 .kpi-content h3 {
     margin: 0;
@@ -123,16 +123,27 @@
 }
 
 /* Header Colors Based on Section */
-.blue-header { background: linear-gradient(to right, #e3f2fd, #ffffff); border-left: 4px solid #1976d2; }
-.blue-header h2 { color: #1565c0; }
-.blue-header .outline-icon { --sds-c-icon-color-foreground: #1565c0; }
+.orange-header { 
+    background: #ffffff; 
+    border-bottom: 2px solid #ffedd5;
+}
 
-.error-header { background: linear-gradient(to right, #ffebee, #ffffff); border-left: 4px solid #d32f2f; }
-.error-header h2 { color: #c62828; }
-.error-header .outline-icon { --sds-c-icon-color-foreground: #c62828; }
+.orange-tag {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: #ffffff !important;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 10px rgba(234, 88, 12, 0.25);
+    display: inline-flex;
+    align-items: center;
+}
 
-.default-header { background: #f8f9fa; border-left: 4px solid #78909c; }
-.default-header .outline-icon { --sds-c-icon-color-foreground: #455a64; }
+.orange-tag .outline-icon { 
+    --sds-c-icon-color-foreground: #ffffff; 
+}
 
 .card-body {
     padding: 24px;
