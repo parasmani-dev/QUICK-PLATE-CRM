@@ -51,13 +51,12 @@
 }
 
 .kpi-icon-container {
-    padding: 16px;
+    padding: 14px;
     border-radius: 50%;
-    margin-right: 18px;
+    margin-right: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.15);
 }
 
 .kpi-card.total .kpi-icon-container { background: #ffedd5; }
@@ -126,24 +125,25 @@
 /* Header Colors Based on Section */
 .orange-header { 
     background: #ffffff; 
-    border-bottom: 2px solid #ffedd5;
+    border-left: 6px solid #ea580c;
+    border-bottom: 1px solid #edf2f7;
 }
 
 .orange-tag {
-    background: linear-gradient(135deg, #f97316, #ea580c);
-    color: #ffffff !important;
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-size: 16px !important;
+    font-size: 22px !important;
     font-weight: 800 !important;
-    letter-spacing: 0.5px;
-    box-shadow: 0 3px 10px rgba(234, 88, 12, 0.25);
-    display: inline-flex;
+    color: #2d3436 !important;
+    letter-spacing: -0.5px;
+    display: flex;
     align-items: center;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
 }
 
 .orange-tag .outline-icon { 
-    --sds-c-icon-color-foreground: #ffffff; 
+    --sds-c-icon-color-foreground: #ea580c; 
+    margin-right: 12px;
 }
 
 .card-body {
