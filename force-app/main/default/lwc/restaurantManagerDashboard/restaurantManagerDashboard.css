@@ -124,15 +124,14 @@
 
 /* Header Colors Based on Section */
 .orange-header { 
-    background: #ffffff; 
-    border-left: 6px solid #ea580c;
-    border-bottom: 1px solid #edf2f7;
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    border-bottom: 1px solid #e65100;
 }
 
 .orange-tag {
     font-size: 22px !important;
-    font-weight: 800 !important;
-    color: #2d3436 !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
     letter-spacing: -0.5px;
     display: flex;
     align-items: center;
@@ -142,7 +141,7 @@
 }
 
 .orange-tag .outline-icon { 
-    --sds-c-icon-color-foreground: #ea580c; 
+    --sds-c-icon-color-foreground: #000000; 
     margin-right: 12px;
 }
 
