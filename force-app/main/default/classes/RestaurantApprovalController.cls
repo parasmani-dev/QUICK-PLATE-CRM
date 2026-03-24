@@ -69,6 +69,76 @@ public with sharing class RestaurantApprovalController {
         return requests;
     }
 
+    @AuraEnabled(cacheable=true)
+    public static List<ApprovalRequestWrapper> getPastApprovals() {
+        List<ApprovalRequestWrapper> requests = new List<ApprovalRequestWrapper>();
+        try {
+            String restaurantPrefix = Restaurant__c.sObjectType.getDescribe().getKeyPrefix();
+            
+            // Query Process Instances that have completed steps
+            List<ProcessInstanceStep> steps = [
+                SELECT ProcessInstance.TargetObjectId, StepStatus, CreatedDate
+                FROM ProcessInstanceStep
+                WHERE StepStatus IN ('Approved', 'Rejected')
+                ORDER BY CreatedDate DESC
+                LIMIT 50
+            ];
+            
+            Set<Id> targetIds = new Set<Id>();
+            Map<Id, ProcessInstanceStep> targetToStepMap = new Map<Id, ProcessInstanceStep>();
+            
+            for(ProcessInstanceStep step : steps) {
+                if(step.ProcessInstance != null && step.ProcessInstance.TargetObjectId != null && 
+                   String.valueOf(step.ProcessInstance.TargetObjectId).startsWith(restaurantPrefix)) {
+                    
+                    // Keep the latest step for a given target
+                    if(!targetIds.contains(step.ProcessInstance.TargetObjectId)) {
+                        targetIds.add(step.ProcessInstance.TargetObjectId);
+                        targetToStepMap.put(step.ProcessInstance.TargetObjectId, step);
+                    }
+                    if(targetIds.size() >= 20) break; // limit to 20 past approvals
+                }
+            }
+            
+            if(targetIds.isEmpty()) return requests;
+            
+            // Re-fetch related restaurant fields
+            List<Restaurant__c> restaurants = [
+                SELECT Id, Name, Owner.Name, City__c, Onboarding_Status__c, Address__c, Avg_Prep_Time_Min__c, Prep_Time_Risk_Level__c
+                FROM Restaurant__c
+                WHERE Id IN :targetIds
+            ];
+            
+            Map<Id, Restaurant__c> restMap = new Map<Id, Restaurant__c>(restaurants);
+            
+            for(Id targetId : targetIds) {
+                if(restMap.containsKey(targetId)) {
+                    Restaurant__c rest = restMap.get(targetId);
+                    ProcessInstanceStep step = targetToStepMap.get(targetId);
+                    
+                    ApprovalRequestWrapper wrapper = new ApprovalRequestWrapper();
+                    wrapper.workItemId = null;
+                    wrapper.restaurantId = rest.Id;
+                    wrapper.restaurantName = rest.Name;
+                    wrapper.ownerName = rest.Owner.Name;
+                    wrapper.city = rest.City__c != null ? rest.City__c : 'N/A';
+                    
+                    // Use Approval Step Status
+                    wrapper.status = step.StepStatus;
+                    wrapper.address = rest.Address__c != null ? rest.Address__c : 'N/A';
+                    wrapper.avgPrepTime = rest.Avg_Prep_Time_Min__c;
+                    wrapper.prepTimeRiskLevel = rest.Prep_Time_Risk_Level__c != null ? rest.Prep_Time_Risk_Level__c : 'N/A';
+                    wrapper.createdDate = step.CreatedDate;
+                    
+                    requests.add(wrapper);
+                }
+            }
+        } catch (Exception e) {
+            throw new AuraHandledException('Error fetching past approvals: ' + e.getMessage());
+        }
+        return requests;
+    }
+
     @AuraEnabled
     public static void processApproval(Id workItemId, String action, String comments) {
         try {

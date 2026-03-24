@@ -1,0 +1,211 @@
+<template>
+    <div class="dashboard-container">
+        <!-- Dashboard Header -->
+        <header class="slds-m-bottom_large dashboard-header">
+            <h1 class="slds-text-heading_large slds-text-color_default slds-m-bottom_xx-small">Restaurant Manager Dashboard</h1>
+            <p class="slds-text-color_weak">Overview of restaurant performance, issues, and onboarding</p>
+        </header>
+
+        <!-- Error Handling -->
+        <template if:true={error}>
+            <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_medium">
+                <span class="slds-assistive-text">error</span>
+                <h2>{error}</h2>
+            </div>
+        </template>
+
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <div class="slds-is-relative slds-m-vertical_xx-large spinner-container">
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <!-- Section 1: KPI Cards -->
+            <section class="kpi-section">
+                <!-- Total -->
+                <div class="kpi-card total">
+                    <div class="kpi-icon-container">
+                        <lightning-icon icon-name="utility:company" size="medium" class="kpi-icon"></lightning-icon>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Total Restaurants</h3>
+                        <p class="kpi-value">{kpiData.totalRestaurants}</p>
+                    </div>
+                </div>
+                <!-- Active -->
+                <div class="kpi-card active">
+                    <div class="kpi-icon-container">
+                        <lightning-icon icon-name="utility:success" size="medium" class="kpi-icon"></lightning-icon>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Active</h3>
+                        <p class="kpi-value">{kpiData.activeRestaurants}</p>
+                    </div>
+                </div>
+                <!-- Inactive -->
+                <div class="kpi-card inactive">
+                    <div class="kpi-icon-container">
+                        <lightning-icon icon-name="utility:strikethrough" size="medium" class="kpi-icon"></lightning-icon>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Inactive</h3>
+                        <p class="kpi-value">{kpiData.inactiveRestaurants}</p>
+                    </div>
+                </div>
+                <!-- Pending -->
+                <div class="kpi-card pending">
+                    <div class="kpi-icon-container">
+                        <lightning-icon icon-name="utility:clock" size="medium" class="kpi-icon"></lightning-icon>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Pending Approvals</h3>
+                        <p class="kpi-value">{kpiData.pendingApprovals}</p>
+                    </div>
+                </div>
+                <!-- Issues -->
+                <div class="kpi-card issues">
+                    <div class="kpi-icon-container">
+                        <lightning-icon icon-name="utility:warning" size="medium" class="kpi-icon"></lightning-icon>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Issues</h3>
+                        <p class="kpi-value">{kpiData.restaurantsWithIssues}</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom Layout: Vertically Stacked as requested -->
+            <div class="stacked-sections">
+                
+                <!-- Section 2: Top Performing Restaurants -->
+                <section class="card-section top-performers">
+                    <div class="card-header blue-header">
+                        <h2>
+                            <lightning-icon icon-name="utility:trending" size="small" class="slds-m-right_small outline-icon"></lightning-icon>
+                            Top Performing Restaurants
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered custom-table">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th>Restaurant Name</th>
+                                    <th>Owner</th>
+                                    <th>Total Orders</th>
+                                    <th>Completed Orders</th>
+                                    <th>SLA Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={topRestaurants} for:item="rest">
+                                    <tr key={rest.id}>
+                                        <td class="bold-text">{rest.name}</td>
+                                        <td>{rest.ownerName}</td>
+                                        <td>{rest.totalOrders}</td>
+                                        <td class="success-text">{rest.completedOrders}</td>
+                                        <td>
+                                            <div class="sla-badge">
+                                                <lightning-formatted-number value={rest.slaPerformance} maximum-fraction-digits="1"></lightning-formatted-number>%
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Section 3: Problematic Restaurants -->
+                <section class="card-section problematic">
+                    <div class="card-header error-header">
+                        <h2>
+                            <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_small outline-icon"></lightning-icon>
+                            Problematic Restaurants
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <template for:each={problemRestaurants} for:item="rest">
+                            <div key={rest.id} class="problem-card">
+                                <div class="problem-card-header">
+                                    <div class="rest-details">
+                                        <h3 class="rest-name">{rest.name}</h3>
+                                        <p class="owner-name">Owner: {rest.ownerName}</p>
+                                    </div>
+                                    <div class="risk-badge-container">
+                                        <span class={rest.riskClass}>
+                                            {rest.riskLevel} RISK ({rest.openTicketsCount} tickets)
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="ticket-list">
+                                    <template for:each={rest.tickets} for:item="tix" for:index="index">
+                                        <div key={tix.keyId} class="ticket-item">
+                                            <div class="ticket-type">
+                                                <lightning-icon icon-name="utility:priority" size="xx-small" class="issue-icon"></lightning-icon> 
+                                                <strong>{tix.issueType}</strong>
+                                            </div>
+                                            <div class="ticket-notes">
+                                                <span class="note-label">Customer Asked/Investigation:</span> 
+                                                <span class="note-value">{tix.customerInvestigation}</span>
+                                            </div>
+                                            <div class="ticket-notes">
+                                                <span class="note-label">Agent Resolution:</span> 
+                                                <span class="note-value">{tix.resolutionNotes}</span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <template if:false={hasProblemRestaurants}>
+                            <div class="empty-state">
+                                <div class="icon-circle">
+                                    <lightning-icon icon-name="utility:check" size="medium"></lightning-icon>
+                                </div>
+                                <h3>All Clear!</h3>
+                                <p>No problematic restaurants currently have open tickets.</p>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+
+                <!-- Section 4: Recent Approvals -->
+                <section class="card-section recent-approvals">
+                    <div class="card-header default-header">
+                        <h2>
+                            <lightning-icon icon-name="utility:routing_offline" size="small" class="slds-m-right_small outline-icon"></lightning-icon>
+                            Recent Approvals
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered custom-table">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th>Restaurant Name</th>
+                                    <th>Owner</th>
+                                    <th>Status</th>
+                                    <th>Created Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={recentApprovals} for:item="app">
+                                    <tr key={app.id}>
+                                        <td class="bold-text">{app.name}</td>
+                                        <td>{app.ownerName}</td>
+                                        <td><span class="status-badge status-approved">{app.status}</span></td>
+                                        <td class="date-text">
+                                            <lightning-formatted-date-time value={app.createdDate} year="numeric" month="short" day="2-digit" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+            </div>
+        </template>
+    </div>
+</template>

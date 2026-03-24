@@ -2,6 +2,7 @@ import { LightningElement, track, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { refreshApex } from '@salesforce/apex';
 import getPendingApprovals from '@salesforce/apex/RestaurantApprovalController.getPendingApprovals';
+import getPastApprovals from '@salesforce/apex/RestaurantApprovalController.getPastApprovals';
 import processApproval from '@salesforce/apex/RestaurantApprovalController.processApproval';
 import hasAccess from '@salesforce/customPermission/Operation_LWC_Components';
 
@@ -13,6 +14,8 @@ export default class RestaurantApprovalConsole extends LightningElement {
     @track comments = '';
     @track error = '';
     @track hasDashboardAccess = false;
+    @track pastApprovals = [];
+    @track isPastLoading = true;
 
     connectedCallback() {
         this.hasDashboardAccess = hasAccess;
@@ -20,6 +23,7 @@ export default class RestaurantApprovalConsole extends LightningElement {
 
     // To hold the wired result for refreshApex
     wiredRequestsResult;
+    wiredPastRequestsResult;
 
     @wire(getPendingApprovals)
     wiredApprovals(result) {
@@ -48,6 +52,31 @@ export default class RestaurantApprovalConsole extends LightningElement {
             this.requests = [];
             this.isLoading = false;
         }
+    }
+
+    @wire(getPastApprovals)
+    wiredPastData(result) {
+        this.wiredPastRequestsResult = result;
+        if (result.data) {
+            this.pastApprovals = result.data.map(req => {
+                const isAccepted = req.status === 'Accepted' || req.status === 'Approved';
+                return {
+                    ...req,
+                    isIconCheck: isAccepted,
+                    isIconClose: req.status === 'Rejected',
+                    cardClass: isAccepted ? 'past-card accepted' : 'past-card rejected'
+                };
+            });
+            this.isPastLoading = false;
+        } else if (result.error) {
+            console.error('Error fetching past approvals: ', result.error);
+            this.pastApprovals = [];
+            this.isPastLoading = false;
+        }
+    }
+
+    get hasPastApprovals() {
+        return this.pastApprovals && this.pastApprovals.length > 0;
     }
 
     get isListEmpty() {
@@ -114,6 +143,9 @@ export default class RestaurantApprovalConsole extends LightningElement {
             this.selectedRequest = null;
             this.comments = '';
             await refreshApex(this.wiredRequestsResult);
+            if (this.wiredPastRequestsResult) {
+                await refreshApex(this.wiredPastRequestsResult);
+            }
             
         } catch (error) {
             console.error('Action error', error);

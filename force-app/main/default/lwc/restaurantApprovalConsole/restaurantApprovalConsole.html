@@ -137,9 +137,47 @@
                 </template>
                 
                 <template if:false={selectedRequest}>
-                    <div class="empty-state-details">
-                        <lightning-icon icon-name="utility:touch_action" size="large"></lightning-icon>
-                        <p>Select a restaurant to view details</p>
+                    <div class="past-approvals-section">
+                        <div class="details-header">
+                            <h2>Past Approvals</h2>
+                        </div>
+                        <template if:true={isPastLoading}>
+                            <div class="loading-state">
+                                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                            </div>
+                        </template>
+                        <template if:false={isPastLoading}>
+                            <template if:true={hasPastApprovals}>
+                                <div class="past-approvals-list">
+                                    <template for:each={pastApprovals} for:item="pastReq">
+                                        <div key={pastReq.restaurantId} class={pastReq.cardClass}>
+                                            <div class="past-card-icon">
+                                                <template if:true={pastReq.isIconCheck}>
+                                                    <lightning-icon icon-name="utility:check" size="small" class="success-icon-small"></lightning-icon>
+                                                </template>
+                                                <template if:true={pastReq.isIconClose}>
+                                                    <lightning-icon icon-name="utility:close" size="small" class="error-icon-small"></lightning-icon>
+                                                </template>
+                                            </div>
+                                            <div class="past-card-details">
+                                                <h3 class="rest-name">{pastReq.restaurantName}</h3>
+                                                <p class="location">{pastReq.city}</p>
+                                            </div>
+                                            <div class="past-card-status">
+                                                <span class="status-badge">{pastReq.status}</span>
+                                                <p class="date"><lightning-formatted-date-time value={pastReq.createdDate} year="numeric" month="short" day="2-digit"></lightning-formatted-date-time></p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template if:false={hasPastApprovals}>
+                                <div class="empty-state-details">
+                                    <lightning-icon icon-name="utility:history" size="large"></lightning-icon>
+                                    <p>No past approvals found.</p>
+                                </div>
+                            </template>
+                        </template>
                     </div>
                 </template>
             </section>
