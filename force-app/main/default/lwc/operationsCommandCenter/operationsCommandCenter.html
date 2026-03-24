@@ -1,6 +1,8 @@
 <template>
-    <div class="cmd-center">
-        <!-- HEADER -->
+    <!-- Render UI only if user has the Operation_LWC_Components Custom Permission -->
+    <template if:true={hasDashboardAccess}>
+        <div class="cmd-center">
+            <!-- HEADER -->
         <header class="cmd-header fade-in">
             <div class="header-icon">
                 <lightning-icon icon-name="custom:custom62" size="medium" alternative-text="Command Center"></lightning-icon>
@@ -185,5 +187,16 @@
                 <lightning-button label="Retry" variant="brand" onclick={refreshData} class="slds-m-top_medium"></lightning-button>
             </div>
         </template>
-    </div>
+        </div>
+    </template>
+    
+    <!-- Render alternative UI for unauthorized users -->
+    <template if:false={hasDashboardAccess}>
+        <lightning-card>
+            <div class="slds-p-around_medium slds-text-align_center slds-text-color_error">
+                <lightning-icon icon-name="utility:error" alternative-text="Error" variant="error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <strong>Access Denied:</strong> You do not have the required permissions to view this Operations Dashboard.
+            </div>
+        </lightning-card>
+    </template>
 </template>

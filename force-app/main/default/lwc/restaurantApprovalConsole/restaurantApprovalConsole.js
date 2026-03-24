@@ -3,6 +3,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { refreshApex } from '@salesforce/apex';
 import getPendingApprovals from '@salesforce/apex/RestaurantApprovalController.getPendingApprovals';
 import processApproval from '@salesforce/apex/RestaurantApprovalController.processApproval';
+import hasAccess from '@salesforce/customPermission/Operation_LWC_Components';
 
 export default class RestaurantApprovalConsole extends LightningElement {
     @track requests = [];
@@ -11,6 +12,11 @@ export default class RestaurantApprovalConsole extends LightningElement {
     @track isActionLoading = false;
     @track comments = '';
     @track error = '';
+    @track hasDashboardAccess = false;
+
+    connectedCallback() {
+        this.hasDashboardAccess = hasAccess;
+    }
 
     // To hold the wired result for refreshApex
     wiredRequestsResult;

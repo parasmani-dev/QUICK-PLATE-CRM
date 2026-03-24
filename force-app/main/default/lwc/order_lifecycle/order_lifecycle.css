@@ -27,7 +27,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    background: linear-gradient(135deg, #0984e3 0%, #0097e6 100%);
     border-radius: 12px 12px 0 0;
     flex-shrink: 0; /* Important: prevents header from shrinking */
 }
@@ -35,15 +35,15 @@
 .stage-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #333d47;
+    color: #ffffff;
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .badge {
-    background-color: #0070d2;
-    color: white;
+    background-color: #ffffff;
+    color: #0984e3;
     padding: 0.2rem 0.6rem;
     border-radius: 20px;
     font-size: 0.85rem;
@@ -70,7 +70,7 @@
     transition: all 0.2s ease-in-out;
     cursor: grab;
     position: relative;
-    border-left: 4px solid #0070d2;
+    border-left: 4px solid #0984e3;
 }
 
 .kanban-card:active {
@@ -148,7 +148,7 @@
 .card-detail.total {
     margin-top: 0.5rem;
     font-size: 1rem;
-    color: #0070d2;
+    color: #0984e3;
     font-weight: 700;
 }
 
