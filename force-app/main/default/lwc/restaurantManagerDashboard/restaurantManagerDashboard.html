@@ -1,9 +1,11 @@
 <template>
-    <div class="dashboard-container">
-        <!-- Dashboard Header -->
-        <header class="slds-m-bottom_large dashboard-header">
-            <h1 class="slds-text-heading_large slds-text-color_default slds-m-bottom_xx-small">Restaurant Manager Dashboard</h1>
-        </header>
+    <!-- Render UI only if user has the Restaurant_LWC_Components Custom Permission -->
+    <template if:true={hasDashboardAccess}>
+        <div class="dashboard-container">
+            <!-- Dashboard Header -->
+            <header class="slds-m-bottom_large dashboard-header">
+                <h1 class="slds-text-heading_large slds-text-color_default slds-m-bottom_xx-small">Restaurant Manager Dashboard</h1>
+            </header>
 
         <!-- Error Handling -->
         <template if:true={error}>
@@ -219,4 +221,15 @@
             </div>
         </template>
     </div>
+    </template>
+    
+    <!-- Render alternative UI for unauthorized users -->
+    <template if:false={hasDashboardAccess}>
+        <lightning-card>
+            <div class="slds-p-around_medium slds-text-align_center slds-text-color_error slds-m-vertical_xx-large">
+                <lightning-icon icon-name="utility:error" alternative-text="Error" variant="error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <strong>Access Denied:</strong> You do not have the required permissions to view the Restaurant Manager Dashboard.
+            </div>
+        </lightning-card>
+    </template>
 </template>

@@ -4,7 +4,7 @@ import { refreshApex } from '@salesforce/apex';
 import getPendingApprovals from '@salesforce/apex/RestaurantApprovalController.getPendingApprovals';
 import getPastApprovals from '@salesforce/apex/RestaurantApprovalController.getPastApprovals';
 import processApproval from '@salesforce/apex/RestaurantApprovalController.processApproval';
-import hasAccess from '@salesforce/customPermission/Operation_LWC_Components';
+import hasAccess from '@salesforce/customPermission/Restaurant_LWC_Components';
 
 export default class RestaurantApprovalConsole extends LightningElement {
     @track requests = [];

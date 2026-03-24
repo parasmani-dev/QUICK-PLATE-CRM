@@ -1,6 +1,7 @@
 import { LightningElement, track, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getDashboardData from '@salesforce/apex/RestaurantManagerController.getDashboardData';
+import hasAccess from '@salesforce/customPermission/Restaurant_LWC_Components';
 
 export default class RestaurantManagerDashboard extends NavigationMixin(LightningElement) {
     @track kpiData = { totalRestaurants: 0, activeRestaurants: 0, inactiveRestaurants: 0, pendingApprovals: 0, restaurantsWithIssues: 0 };
@@ -9,6 +10,11 @@ export default class RestaurantManagerDashboard extends NavigationMixin(Lightnin
     @track recentApprovals = [];
     @track error;
     @track isLoading = true;
+    @track hasDashboardAccess = false;
+
+    connectedCallback() {
+        this.hasDashboardAccess = hasAccess;
+    }
 
     @wire(getDashboardData)
     wiredData({ error, data }) {
