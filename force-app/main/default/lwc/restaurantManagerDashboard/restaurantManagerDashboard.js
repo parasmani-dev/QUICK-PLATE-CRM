@@ -1,7 +1,8 @@
 import { LightningElement, track, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import getDashboardData from '@salesforce/apex/RestaurantManagerController.getDashboardData';
 
-export default class RestaurantManagerDashboard extends LightningElement {
+export default class RestaurantManagerDashboard extends NavigationMixin(LightningElement) {
     @track kpiData = { totalRestaurants: 0, activeRestaurants: 0, inactiveRestaurants: 0, pendingApprovals: 0, restaurantsWithIssues: 0 };
     @track topRestaurants = [];
     @track problemRestaurants = [];
@@ -38,5 +39,18 @@ export default class RestaurantManagerDashboard extends LightningElement {
 
     get hasProblemRestaurants() {
         return this.problemRestaurants && this.problemRestaurants.length > 0;
+    }
+
+    handleNavigateToRecord(event) {
+        const recordId = event.target.dataset.id;
+        if (recordId) {
+            this[NavigationMixin.Navigate]({
+                type: 'standard__recordPage',
+                attributes: {
+                    recordId: recordId,
+                    actionName: 'view'
+                }
+            });
+        }
     }
 }

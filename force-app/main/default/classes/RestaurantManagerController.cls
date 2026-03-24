@@ -27,6 +27,7 @@ public with sharing class RestaurantManagerController {
     }
 
     public class TicketDetail {
+        @AuraEnabled public String id { get; set; }
         @AuraEnabled public String issueType { get; set; }
         @AuraEnabled public String customerInvestigation { get; set; }
         @AuraEnabled public String resolutionNotes { get; set; }
@@ -146,6 +147,7 @@ public with sharing class RestaurantManagerController {
                 pr.openTicketsCount++;
                 
                 TicketDetail td = new TicketDetail();
+                td.id = st.Id;
                 td.issueType = st.Issue_Type__c != null ? st.Issue_Type__c : 'General Issue';
                 td.customerInvestigation = st.Investigation_Notes__c != null ? st.Investigation_Notes__c : 'No notes provided.';
                 td.resolutionNotes = st.Resolution_Notes__c != null ? st.Resolution_Notes__c : 'Pending resolution.';

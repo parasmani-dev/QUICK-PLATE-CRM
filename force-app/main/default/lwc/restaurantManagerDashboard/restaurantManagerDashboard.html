@@ -3,7 +3,6 @@
         <!-- Dashboard Header -->
         <header class="slds-m-bottom_large dashboard-header">
             <h1 class="slds-text-heading_large slds-text-color_default slds-m-bottom_xx-small">Restaurant Manager Dashboard</h1>
-            <p class="slds-text-color_weak">Overview of restaurant performance, issues, and onboarding</p>
         </header>
 
         <!-- Error Handling -->
@@ -96,6 +95,7 @@
                                     <th>Total Orders</th>
                                     <th>Completed Orders</th>
                                     <th>SLA Performance</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -109,6 +109,9 @@
                                             <div class="sla-badge">
                                                 <lightning-formatted-number value={rest.slaPerformance} maximum-fraction-digits="1"></lightning-formatted-number>%
                                             </div>
+                                        </td>
+                                        <td>
+                                            <lightning-button label="View" variant="brand-outline" size="small" data-id={rest.id} onclick={handleNavigateToRecord}></lightning-button>
                                         </td>
                                     </tr>
                                 </template>
@@ -133,10 +136,11 @@
                                         <h3 class="rest-name">{rest.name}</h3>
                                         <p class="owner-name">Owner: {rest.ownerName}</p>
                                     </div>
-                                    <div class="risk-badge-container">
+                                    <div class="risk-badge-container slds-grid slds-grid_vertical-align-center">
                                         <span class={rest.riskClass}>
                                             {rest.riskLevel} RISK ({rest.openTicketsCount} tickets)
                                         </span>
+                                        <lightning-button label="View" variant="brand-outline" size="small" class="slds-m-left_small" data-id={rest.id} onclick={handleNavigateToRecord}></lightning-button>
                                     </div>
                                 </div>
                                 <div class="ticket-list">
@@ -153,6 +157,9 @@
                                             <div class="ticket-notes">
                                                 <span class="note-label">Agent Resolution:</span> 
                                                 <span class="note-value">{tix.resolutionNotes}</span>
+                                            </div>
+                                            <div class="slds-m-top_x-small slds-text-align_right">
+                                                <lightning-button label="View Ticket" variant="base" size="small" data-id={tix.id} onclick={handleNavigateToRecord}></lightning-button>
                                             </div>
                                         </div>
                                     </template>
@@ -187,6 +194,7 @@
                                     <th>Owner</th>
                                     <th>Status</th>
                                     <th>Created Date</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -197,6 +205,9 @@
                                         <td><span class="status-badge status-approved">{app.status}</span></td>
                                         <td class="date-text">
                                             <lightning-formatted-date-time value={app.createdDate} year="numeric" month="short" day="2-digit" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                        </td>
+                                        <td>
+                                            <lightning-button label="View" variant="brand-outline" size="small" data-id={app.id} onclick={handleNavigateToRecord}></lightning-button>
                                         </td>
                                     </tr>
                                 </template>
