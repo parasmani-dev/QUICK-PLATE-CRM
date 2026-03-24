@@ -58,7 +58,7 @@ public with sharing class RestaurantManagerController {
             String inactiveQuery = 'SELECT COUNT() FROM Restaurant__c WHERE Is_Active__c = false OR Is_Temporarily_Closed__c = true';
             kpi.inactiveRestaurants = Database.countQuery(inactiveQuery);
             
-            kpi.pendingApprovals = [SELECT COUNT() FROM Restaurant__c WHERE Onboarding_Status__c = 'Pending'];
+            kpi.pendingApprovals = [SELECT COUNT() FROM Restaurant__c WHERE Onboarding_Status__c IN ('Pending', 'Draft')];
             
             // Restaurants with Issues: distinct restaurants from Support_Ticket__c
             AggregateResult[] issueAggs = [SELECT Restaurant__c FROM Support_Ticket__c WHERE Ticket_Status__c NOT IN ('RESOLVED', 'CLOSED') GROUP BY Restaurant__c];
