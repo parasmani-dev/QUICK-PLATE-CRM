@@ -8,6 +8,7 @@
         <members>SupportTicketController</members>
         <members>RefundRequestEngine</members>
         <members>OperationsDashboardController</members>
+        <members>RefundApprovalController</members>
         <name>ApexClass</name>
     </types>
 
@@ -15,6 +16,7 @@
     <types>
         <members>liveOrdersMonitor</members>
         <members>operationsDashboard</members>
+        <members>refundApprovalConsole</members>
         <name>LightningComponentBundle</name>
     </types>
 

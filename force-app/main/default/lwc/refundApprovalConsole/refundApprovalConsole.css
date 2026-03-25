@@ -1,0 +1,263 @@
+:host {
+    display: block;
+    font-family: 'Inter', 'Roboto', sans-serif;
+    background-color: transparent;
+}
+
+/* Master Layout Container */
+.console-container {
+    display: flex;
+    background-color: #F8FAFC;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    height: 85vh; /* Take up majority of viewport to feel app-like */
+    overflow: hidden;
+    border: 1px solid #E2E8F0;
+    margin: 16px;
+}
+
+/* -------------------
+   LEFT PANEL (List)
+---------------------- */
+.left-panel {
+    width: 35%;
+    border-right: 1px solid #E2E8F0;
+    background-color: #F8FAFC;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E2E8F0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    z-index: 2;
+}
+
+.ticket-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+/* Ticket Card Styling */
+.ticket-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.ticket-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    border-color: #CBD5E1;
+}
+
+.ticket-card.selected {
+    border: 2px solid #3B82F6;
+    background-color: #EFF6FF;
+    border-left: 6px solid #3B82F6;
+}
+
+.ticket-card-header strong {
+    font-size: 1.05rem;
+    color: #1E293B;
+}
+
+.ticket-card-body p {
+    font-size: 0.85rem;
+    color: #475569;
+    margin-bottom: 4px;
+}
+
+/* Priority Badges */
+.badge-high {
+    background-color: #FEE2E2 !important;
+    color: #DC2626 !important;
+    border-radius: 4px;
+}
+.badge-medium {
+    background-color: #FEF3C7 !important;
+    color: #D97706 !important;
+    border-radius: 4px;
+}
+.badge-low {
+    background-color: #E0F2FE !important;
+    color: #0284C7 !important;
+    border-radius: 4px;
+}
+
+/* Empty State */
+.empty-state {
+    margin-top: 40px;
+}
+.empty-state h2 {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* -------------------
+   RIGHT PANEL (Detail)
+---------------------- */
+.right-panel {
+    width: 65%;
+    background-color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-panel-empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.detail-header {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E2E8F0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    z-index: 2;
+}
+.detail-header h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #0F172A;
+    letter-spacing: -0.5px;
+}
+
+.detail-content {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #F8FAFC;
+}
+
+/* Inner Info Cards */
+.info-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1E293B;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #E2E8F0;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.info-row span {
+    color: #64748B;
+}
+
+.info-row strong {
+    color: #0F172A;
+}
+
+/* Specific highlight boxes */
+.investigation-box {
+    background: #FFFBEB;
+    border: 1px solid #FEF3C7;
+    padding: 14px;
+    border-radius: 6px;
+}
+
+.notes-text {
+    font-size: 0.875rem;
+    color: #451A03;
+    white-space: pre-wrap;
+    line-height: 1.4;
+}
+
+.text-warning {
+    color: #D97706;
+}
+
+/* Action Area */
+.approval-card {
+    background: #FFFFFF;
+    border: 2px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.action-buttons button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.action-buttons button:active {
+    transform: scale(0.98);
+}
+
+.action-buttons button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.approve-btn {
+    background-color: #10B981;  /* Green for approve */
+    color: white;
+}
+.approve-btn:hover:not(:disabled) {
+    background-color: #059669;
+}
+
+.reject-btn {
+    background-color: #EF4444;  /* Red for reject */
+    color: white;
+}
+.reject-btn:hover:not(:disabled) {
+    background-color: #DC2626;
+}
+
+/* Custom icon colors */
+.alert-icon {
+    --sds-c-icon-color-foreground: #F59E0B;
+}
+
+.sum-icon {
+    --sds-c-icon-color-foreground: #10B981;
+}
+
+/* Custom Scrollbar for inner components */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #F1F5F9; 
+    border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1; 
+    border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8; 
+}

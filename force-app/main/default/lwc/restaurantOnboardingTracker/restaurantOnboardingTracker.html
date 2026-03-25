@@ -1,0 +1,113 @@
+<template>
+    <div class="main-container">
+        <!-- Left Panel: Form -->
+        <div class="left-panel card-section">
+            <div class="card-header orange-header">
+                <h2 class="orange-tag">
+                    <lightning-icon icon-name="utility:add" size="small" class="slds-m-right_small outline-icon"></lightning-icon>
+                    Create New Restaurant
+                </h2>
+            </div>
+            
+            <div class="card-body">
+                <lightning-record-edit-form object-api-name="Restaurant__c" onsuccess={handleSuccess} onsubmit={handleSubmit}>
+                    <lightning-messages></lightning-messages>
+                    <div class="slds-m-bottom_medium">
+                        <p class="form-instructions">Fill Details and automatically submit for approval.</p>
+                    </div>
+
+                    <div class="form-grid">
+                        <lightning-input-field field-name="Name" required></lightning-input-field>
+                        <lightning-input-field field-name="Restaurant_Code__c" required></lightning-input-field>
+                        <lightning-input-field field-name="Restaurant_Owner__c" required></lightning-input-field>
+                        <lightning-input-field field-name="City__c" required></lightning-input-field>
+                        <lightning-input-field field-name="Avg_Prep_Time_Min__c" required></lightning-input-field>
+                    </div>
+                    
+                    <div class="slds-m-top_large slds-text-align_right">
+                        <lightning-button class="orange-btn" variant="brand" type="submit" label="Submit for Approval" disabled={isSubmitting}></lightning-button>
+                    </div>
+                    
+                    <template if:true={isSubmitting}>
+                        <div class="slds-is-relative slds-m-top_medium" style="height: 50px;">
+                            <lightning-spinner alternative-text="Submitting" size="small"></lightning-spinner>
+                        </div>
+                    </template>
+                </lightning-record-edit-form>
+            </div>
+        </div>
+
+        <!-- Right Panel: Tracker Timeline -->
+        <div class="right-panel card-section">
+            <div class="card-header orange-header">
+                <h2 class="orange-tag">
+                    <lightning-icon icon-name="utility:clock" size="small" class="slds-m-right_small outline-icon"></lightning-icon>
+                    Approval Tracker
+                </h2>
+            </div>
+            
+            <div class="card-body scrollable-tracker">
+                <template if:true={isLoading}>
+                    <div class="slds-is-relative slds-m-top_medium" style="height: 100px;">
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </div>
+                </template>
+                
+                <template if:false={isLoading}>
+                    <template if:true={submissions}>
+                        <div class="cards-list">
+                            <template for:each={submissions} for:item="sub">
+                                <div key={sub.restaurantId} class="tracker-card">
+                                    
+                                    <div class="tracker-card-header">
+                                        <div class="card-title">
+                                            <h3>{sub.name}</h3>
+                                            <p>{sub.city} - {sub.restaurantCode}</p>
+                                        </div>
+                                        <div class="card-badge">
+                                            <span class={sub.statusBadgeClass}>{sub.approvalStatus}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Timeline -->
+                                    <div class="timeline-container">
+                                        <template if:true={sub.timeline.length}>
+                                            <div class="timeline">
+                                                <template for:each={sub.timeline} for:item="step">
+                                                    <div key={step.actionDate} class="timeline-step">
+                                                        <div class={step.statusClass}></div>
+                                                        <div class="step-content">
+                                                            <div class="step-header">
+                                                                <strong>{step.stepStatus}</strong> by {step.actorName}
+                                                            </div>
+                                                            <div class="step-date">
+                                                                <lightning-formatted-date-time value={step.actionDate} year="numeric" month="short" day="2-digit" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                                                            </div>
+                                                            <template if:true={step.comments}>
+                                                                <div class="step-comments">"{step.comments}"</div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                        <template if:false={sub.timeline.length}>
+                                            <div class="no-timeline">
+                                                <p>No approval steps yet.</p>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <template if:false={submissions.length}>
+                        <div class="empty-state">
+                            <p>No recent submissions found.</p>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>

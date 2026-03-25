@@ -1,0 +1,206 @@
+<template>
+    <template if:true={hasFinancePermission}>
+        <div class="console-container">
+            
+            <!-- LEFT PANEL: Pending Refunds list -->
+            <div class="left-panel">
+                <div class="panel-header slds-p-around_medium">
+                    <h2 class="slds-text-heading_medium slds-text-color_default slds-m-bottom_none">Pending Refund Requests</h2>
+                    <p class="slds-text-body_small slds-text-color_weak">{pendingTickets.length} approvals pending</p>
+                </div>
+                
+                <div class="ticket-list slds-p-around_small">
+                    <!-- Loading Spinner for List -->
+                    <template if:true={isListLoading}>
+                        <div class="slds-is-relative slds-m-vertical_large" style="height: 100px;">
+                            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                        </div>
+                    </template>
+                    
+                    <!-- Iterating over active tickets -->
+                    <template if:false={isListLoading}>
+                        <template for:each={pendingTickets} for:item="ticket">
+                            <div key={ticket.Id} 
+                                 class={ticket.cardClass} 
+                                 data-id={ticket.Id} 
+                                 onclick={handleTicketSelect}>
+                                 
+                                <div class="ticket-card-header slds-grid slds-grid_vertical-align-center slds-grid_align-spread">
+                                    <strong>{ticket.Name}</strong>
+                                    <span class={ticket.priorityClass}>{ticket.Priority}</span>
+                                </div>
+                                <div class="ticket-card-body slds-m-top_x-small">
+                                    <p><strong>Order:</strong> {ticket.OrderNumber}</p>
+                                    <p><strong>Customer:</strong> {ticket.CustomerName}</p>
+                                    <p><strong>Restaurant:</strong> {ticket.RestaurantName}</p>
+                                    <p class="slds-text-color_weak slds-m-top_xx-small time-ago">
+                                        <lightning-formatted-date-time value={ticket.CreatedDate} 
+                                            year="numeric" month="short" day="2-digit" hour="2-digit" minute="2-digit">
+                                        </lightning-formatted-date-time>
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+                        
+                        <!-- Empty State -->
+                        <template if:false={pendingTickets.length}>
+                            <div class="slds-text-align_center slds-p-around_medium slds-text-color_weak empty-state">
+                                <lightning-icon icon-name="utility:check" size="large" class="slds-m-bottom_small"></lightning-icon>
+                                <h2>All caught up! No pending refunds.</h2>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Ticket Detail View -->
+            <div class="right-panel">
+                <template if:true={selectedTicketId}>
+                    
+                    <template if:true={isDetailLoading}>
+                        <div class="slds-is-relative slds-m-vertical_large" style="height: 300px;">
+                            <lightning-spinner alternative-text="Loading Details" size="large"></lightning-spinner>
+                        </div>
+                    </template>
+                    
+                    <template if:false={isDetailLoading}>
+                        <template if:true={selectedTicketDetails}>
+                            <div class="detail-header slds-p-around_medium">
+                                <h2 class="slds-text-heading_medium">Review Refund: {selectedTicketDetails.TicketNumber}</h2>
+                            </div>
+                            
+                            <div class="detail-content slds-p-around_medium">
+                                
+                                <!-- SECTION 1 & 2: Order & Parties Grid -->
+                                <div class="slds-grid slds-gutters slds-m-bottom_large">
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <div class="info-card">
+                                            <h3 class="section-title">
+                                                <lightning-icon icon-name="utility:cart" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                                Order Details
+                                            </h3>
+                                            <div class="info-row"><span>Order Number:</span> <strong>{selectedTicketDetails.OrderNumber}</strong></div>
+                                            <div class="info-row"><span>Payment Status:</span> <strong>{selectedTicketDetails.PaymentStatus}</strong></div>
+                                            <div class="info-row"><span>Order Total:</span> 
+                                                <strong>
+                                                    <lightning-formatted-number value={selectedTicketDetails.OrderTotal} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                                                </strong>
+                                            </div>
+                                            <div class="info-row"><span>Credits Used:</span> 
+                                                <strong>
+                                                    <lightning-formatted-number value={selectedTicketDetails.CreditsUsed} format-style="currency" currency-code="USD"></lightning-formatted-number>
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <div class="info-card">
+                                            <h3 class="section-title">
+                                                <lightning-icon icon-name="utility:groups" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                                Involved Parties
+                                            </h3>
+                                            <div class="info-row"><span>Customer Name:</span> <strong>{selectedTicketDetails.CustomerName}</strong></div>
+                                            <div class="info-row"><span>Restaurant:</span> <strong>{selectedTicketDetails.RestaurantName}</strong></div>
+                                            <div class="info-row"><span>Delivery Agent:</span> <strong>{selectedTicketDetails.DeliveryAgent}</strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- SECTION 3: Refund Context -->
+                                <div class="info-card slds-m-bottom_large">
+                                    <h3 class="section-title">
+                                        <lightning-icon icon-name="utility:warning" size="small" class="slds-m-right_x-small alert-icon"></lightning-icon>
+                                        Refund Context
+                                    </h3>
+                                    <div class="slds-grid slds-gutters">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <div class="info-row"><span>Issue Type:</span> <strong>{selectedTicketDetails.IssueType}</strong></div>
+                                            <div class="info-row">
+                                                <span>Customer Issue Count:</span> 
+                                                <strong class={issueCountClass}>{selectedTicketDetails.CustomerIssueCount} prev. issues</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-m-top_small investigation-box">
+                                        <p class="slds-text-title_caps slds-m-bottom_xx-small">Investigation Notes</p>
+                                        <p class="notes-text">{selectedTicketDetails.InvestigationNotes}</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- SECTION 4 & 5: Financial Info & Approvals -->
+                                <div class="approval-card">
+                                    <h3 class="section-title">
+                                        <lightning-icon icon-name="utility:moneybag" size="small" class="slds-m-right_x-small sum-icon"></lightning-icon>
+                                        Financial Action
+                                    </h3>
+                                    
+                                    <div class="slds-grid slds-gutters slds-grid_vertical-align-end slds-m-bottom_medium">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <lightning-input type="number" 
+                                                label="Recommended Refund Amount" 
+                                                value={refundAmount} 
+                                                formatter="currency" 
+                                                step="0.01" 
+                                                onchange={handleAmountChange}>
+                                            </lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-2 slds-text-align_right slds-text-color_weak">
+                                            <em>Max available: <lightning-formatted-number value={selectedTicketDetails.OrderTotal} format-style="currency" currency-code="USD"></lightning-formatted-number></em>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-m-bottom_medium">
+                                        <lightning-textarea label="Finance Notes" 
+                                            placeholder="Write internal rationale for approval/rejection..." 
+                                            value={financeNotes} 
+                                            onchange={handleNotesChange}
+                                            required
+                                            message-when-value-missing="Notes are required for rejection.">
+                                        </lightning-textarea>
+                                    </div>
+                                    
+                                    <div class="action-buttons slds-grid slds-grid_align-end slds-is-relative">
+                                        <template if:true={isActionLoading}>
+                                            <lightning-spinner alternative-text="Processing" size="small"></lightning-spinner>
+                                        </template>
+                                        
+                                        <button class="reject-btn" disabled={isActionLoading} onclick={handleReject}>
+                                            <lightning-icon icon-name="utility:close" size="x-small" variant="inverse" class="slds-m-right_xx-small"></lightning-icon>
+                                            Reject
+                                        </button>
+                                        
+                                        <button class="approve-btn slds-m-left_small" disabled={isActionLoading} onclick={handleApprove}>
+                                            <lightning-icon icon-name="utility:check" size="x-small" variant="inverse" class="slds-m-right_xx-small"></lightning-icon>
+                                            Approve Refund
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </template>
+                    </template>
+                </template>
+                
+                <!-- Initial Empty State -->
+                <template if:false={selectedTicketId}>
+                    <div class="right-panel-empty slds-text-align_center slds-p-around_xx-large slds-text-color_weak">
+                        <lightning-icon icon-name="utility:search" size="large" class="slds-m-bottom_medium"></lightning-icon>
+                        <h2 class="slds-text-heading_medium">Select a Refund Request</h2>
+                        <p class="slds-m-top_x-small">Click a pending request on the left to review its context, payment details, and approve/reject the refund.</p>
+                    </div>
+                </template>
+            </div>
+            
+        </div>
+    </template>
+    
+    <!-- Render alternative UI for unauthorized users -->
+    <template if:false={hasFinancePermission}>
+        <lightning-card>
+            <div class="slds-p-around_medium slds-text-align_center slds-text-color_error slds-m-vertical_xx-large">
+                <lightning-icon icon-name="utility:error" alternative-text="Error" variant="error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <strong>Access Denied:</strong> You do not have the required permissions (Finance_LWC_Components) to view the Finance Refund Approval Console.
+            </div>
+        </lightning-card>
+    </template>
+</template>
