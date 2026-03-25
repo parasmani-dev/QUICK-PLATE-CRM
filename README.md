@@ -72,8 +72,7 @@ When order becomes `CONFIRMED`:
 
 - Invocable Apex runs
 - Filters eligible agents:
-  - `Is_Active__c = TRUE`
-  - `Service_Status__c = ONLINE`
+
   - Same city
   - Under max active load
   - Rejection count below threshold
