@@ -1,0 +1,250 @@
+<template>
+    <template if:true={hasFinancePermission}>
+        <div class="dashboard-container">
+            <!-- Header & Filter -->
+            <div class="header-section fade-in">
+                <div>
+                    <h1 class="page-title">Finance Health Dashboard</h1>
+                    <p class="page-subtitle">Monitoring Revenue, Margins, and Leakages</p>
+                </div>
+                <div class="filter-box">
+                    <lightning-combobox 
+                        name="timeFilter" 
+                        value={timeFilter} 
+                        options={filterOptions} 
+                        onchange={handleFilterChange}
+                        variant="label-hidden"
+                        class="large-combobox">
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <template if:true={isLoading}>
+                <div class="slds-is-relative slds-m-top_large" style="height: 200px;">
+                    <lightning-spinner alternative-text="Loading Metrics" size="large"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:true={hasData}>
+                <!-- SECTION 1: TOP KPI CARDS -->
+                <div class="kpi-grid">
+                    <!-- Revenue Card -->
+                    <div class="kpi-card slide-up-1">
+                        <div class="kpi-icon icon-purple"><lightning-icon icon-name="utility:moneybag" size="small"></lightning-icon></div>
+                        <h3 class="kpi-title">Total Revenue</h3>
+                        <div class="kpi-values">
+                            <span class="kpi-primary">
+                                <lightning-formatted-number value={data.grossRevenue} format-style="currency" currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number> <span class="kpi-label">(Gross)</span>
+                            </span>
+                            <span class="kpi-secondary">
+                                <lightning-formatted-number value={data.netRevenue} format-style="currency" currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number> <span class="kpi-label">(Net)</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Refunds Card -->
+                    <div class="kpi-card slide-up-2">
+                        <div class="kpi-icon icon-red"><lightning-icon icon-name="utility:undo" size="small"></lightning-icon></div>
+                        <h3 class="kpi-title">Total Refunds</h3>
+                        <div class="kpi-values">
+                            <span class="kpi-primary">
+                                <lightning-formatted-number value={data.totalRefunds} format-style="currency" currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Refund % Card -->
+                    <div class="kpi-card slide-up-3">
+                        <div class="kpi-icon icon-orange"><lightning-icon icon-name="utility:percent" size="small"></lightning-icon></div>
+                        <h3 class="kpi-title">Refund Percentage</h3>
+                        <div class="kpi-values">
+                            <span class="kpi-primary">
+                                <lightning-formatted-number value={data.refundPercentage} maximum-fraction-digits="1"></lightning-formatted-number>%
+                            </span>
+                            <span class="kpi-trend">
+                                <template if:true={data.isRefundTrendUp}>
+                                    <span class="trend-bad">↑ from <lightning-formatted-number value={data.priorWeekRefundPercentage} maximum-fraction-digits="1"></lightning-formatted-number>% (prior)</span>
+                                </template>
+                                <template if:true={data.isRefundTrendDown}>
+                                    <span class="trend-good">↓ from <lightning-formatted-number value={data.priorWeekRefundPercentage} maximum-fraction-digits="1"></lightning-formatted-number>% (prior)</span>
+                                </template>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Failed Transactions Card -->
+                    <div class="kpi-card slide-up-4">
+                        <div class="kpi-icon icon-error"><lightning-icon icon-name="utility:error" size="small"></lightning-icon></div>
+                        <h3 class="kpi-title">Failed Transactions</h3>
+                        <div class="kpi-values">
+                            <span class="kpi-primary">{data.failedTransactions}</span>
+                            <span class="kpi-secondary">
+                                <lightning-formatted-number value={data.failureRate} maximum-fraction-digits="1"></lightning-formatted-number>% Failure Rate
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- AOV Card -->
+                    <div class="kpi-card slide-up-5">
+                        <div class="kpi-icon icon-blue"><lightning-icon icon-name="utility:metrics" size="small"></lightning-icon></div>
+                        <h3 class="kpi-title">Avg Order Value (AOV)</h3>
+                        <div class="kpi-values">
+                            <span class="kpi-primary">
+                                <lightning-formatted-number value={data.aov} format-style="currency" currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Refund per Order Card -->
+                    <div class="kpi-card slide-up-6">
+                        <div class="kpi-icon icon-red-light"><lightning-icon icon-name="utility:checkout" size="small"></lightning-icon></div>
+                        <h3 class="kpi-title">Refund per Order</h3>
+                        <div class="kpi-values">
+                            <span class="kpi-primary">
+                                <lightning-formatted-number value={data.refundPerOrder} format-style="currency" currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: HEALTH INSIGHTS -->
+                <div class="section-two-grid slds-m-top_large">
+                    <div class="dashboard-panel zoom-in">
+                        <h3 class="panel-header">Revenue vs Refund Trend</h3>
+                        <div class="trend-bars-container">
+                            <template for:each={data.dailyTrends} for:item="trend">
+                                <div key={trend.day} class="trend-bar-row">
+                                    <span class="trend-day">{trend.day}</span>
+                                    <div class="trend-bar-bg">
+                                        <div class="rev-bar" style={trend.revStyle}>
+                                            $<lightning-formatted-number value={trend.revenue} maximum-fraction-digits="0"></lightning-formatted-number>
+                                            <div class="ref-bar" style={trend.refStyle} title="Refunds"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template if:false={data.hasDailyTrends}>
+                                <div class="empty-state">No trend data available for this timeframe.</div>
+                            </template>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-panel zoom-in-delay">
+                        <h3 class="panel-header">Payment Status Breakdown</h3>
+                        <div class="status-bars">
+                            <div class="status-row">
+                                <div class="status-label">SUCCESS</div>
+                                <div class="status-rail">
+                                    <div class="status-fill fill-success" style={data.successRailStyle}></div>
+                                </div>
+                                <div class="status-val"><lightning-formatted-number value={data.successRate} maximum-fraction-digits="1"></lightning-formatted-number>%</div>
+                            </div>
+                            <div class="status-row">
+                                <div class="status-label">FAILED</div>
+                                <div class="status-rail">
+                                    <div class="status-fill fill-failed" style={data.failedRailStyle}></div>
+                                </div>
+                                <div class="status-val"><lightning-formatted-number value={data.failedRate} maximum-fraction-digits="1"></lightning-formatted-number>%</div>
+                            </div>
+                            <div class="status-row">
+                                <div class="status-label">PENDING</div>
+                                <div class="status-rail">
+                                    <div class="status-fill fill-pending" style={data.pendingRailStyle}></div>
+                                </div>
+                                <div class="status-val"><lightning-formatted-number value={data.pendingRate} maximum-fraction-digits="1"></lightning-formatted-number>%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: LEAKAGE DETECTION -->
+                <div class="dashboard-panel slds-m-top_large fade-up">
+                    <h3 class="panel-header alert-header"><lightning-icon icon-name="utility:warning" size="small" class="slds-m-right_x-small"></lightning-icon> Leakage Detection</h3>
+                    <div class="leakage-grid">
+                        <div class="leakage-col">
+                            <h4>Top Restaurants by Refund</h4>
+                            <template for:each={data.topRestaurants} for:item="rest">
+                                <div key={rest.name} class="leakage-item click-btn" data-id={rest.recordId} onclick={handleViewRecord}>
+                                    <span>{rest.name}</span>
+                                    <strong>$<lightning-formatted-number value={rest.amount} maximum-fraction-digits="0"></lightning-formatted-number></strong>
+                                </div>
+                            </template>
+                            <template if:false={data.hasTopRestaurants}><div class="slds-text-color_weak slds-p-around_small">All good! No refunds detected here.</div></template>
+                        </div>
+                        <div class="leakage-col">
+                            <h4>Top Customers by Refund</h4>
+                            <template for:each={data.topCustomers} for:item="cust">
+                                <div key={cust.name} class="leakage-item click-btn" data-id={cust.recordId} onclick={handleViewRecord}>
+                                    <span>{cust.name}</span>
+                                    <strong>$<lightning-formatted-number value={cust.amount} maximum-fraction-digits="0"></lightning-formatted-number></strong>
+                                </div>
+                            </template>
+                            <template if:false={data.hasTopCustomers}><div class="slds-text-color_weak slds-p-around_small">All good! No refunds detected here.</div></template>
+                        </div>
+                        <div class="leakage-col">
+                            <h4>Orders with Highest Refund</h4>
+                            <template for:each={data.highRefundOrders} for:item="ord">
+                                <div key={ord.name} class="leakage-item click-btn" data-id={ord.recordId} onclick={handleViewRecord}>
+                                    <span>{ord.name}</span>
+                                    <strong>$<lightning-formatted-number value={ord.amount} maximum-fraction-digits="0"></lightning-formatted-number></strong>
+                                </div>
+                            </template>
+                            <template if:false={data.hasHighRefundOrders}><div class="slds-text-color_weak slds-p-around_small">All good! No refunds detected here.</div></template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: TRANSACTION MONITOR -->
+                <div class="dashboard-panel slds-m-top_large slide-up-late">
+                    <h3 class="panel-header">Recent Transactions Monitor</h3>
+                    <div class="table-container">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Time</th>
+                                    <th class="slds-text-align_center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={data.recentTransactions} for:item="tx">
+                                    <tr key={tx.Id}>
+                                        <td>{tx.OrderId}</td>
+                                        <td>
+                                            <template if:true={tx.isRefund}>
+                                                <span class="badge-refund">REFUND</span>
+                                            </template>
+                                            <template if:false={tx.isRefund}>
+                                                <span class="badge-payment">PAYMENT</span>
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <strong><lightning-formatted-number value={tx.Amount} format-style="currency" currency-code="USD"></lightning-formatted-number></strong>
+                                        </td>
+                                        <td>{tx.Status}</td>
+                                        <td class="tx-time">{tx.TimeStr}</td>
+                                        <td class="slds-text-align_center">
+                                            <button class="theme-btn" data-id={tx.Id} onclick={handleViewRecord}>View</button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </template>
+    
+    <template if:false={hasFinancePermission}>
+        <lightning-card>
+            <div class="slds-p-around_medium slds-text-align_center slds-text-color_error slds-m-vertical_xx-large">
+                <lightning-icon icon-name="utility:error" alternative-text="Error" variant="error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <strong>Access Denied:</strong> You do not have the required permissions to view the Finance Analytics Dashboard.
+            </div>
+        </lightning-card>
+    </template>
+</template>

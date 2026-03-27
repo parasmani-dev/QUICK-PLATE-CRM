@@ -133,40 +133,6 @@ public with sharing class RefundApprovalController {
                 ticket.Finance_Approval_Status__c = 'APPROVED';
             }
             
-            // Update Ticket Status
-            ticket.Ticket_Status__c = 'RESOLVED';
-            ticket.Internal_Notes__c = notes; // Storing notes
-            update ticket;
-            
-            if (ticket.Order__c != null) {
-                // 2. Link to Original Payment (Best effort: getting earliest PAYMENT related to Order)
-                Id originalPaymentId;
-                List<Payment_Transaction__c> pastPayments = [
-                    SELECT Id FROM Payment_Transaction__c 
-                    WHERE Order__c = :ticket.Order__c AND Transaction_Type__c = 'PAYMENT' 
-                    ORDER BY CreatedDate ASC LIMIT 1
-                ];
-                if (!pastPayments.isEmpty()) {
-                    originalPaymentId = pastPayments[0].Id;
-                }
-                
-                // 3. Create Refund Transaction
-                Payment_Transaction__c refundTx = new Payment_Transaction__c();
-                refundTx.Order__c = ticket.Order__c;
-                refundTx.Transaction_Type__c = 'REFUND';
-                refundTx.Amount__c = amount;
-                refundTx.Status__c = 'SUCCESS';
-                if (originalPaymentId != null) {
-                    refundTx.Linked_Original_Transaction__c = originalPaymentId;
-                }
-                insert refundTx;
-                
-                // 4. Update Order Status
-                Order__c o = new Order__c(Id = ticket.Order__c);
-                o.Payment_Status__c = 'REFUNDED';
-                update o;
-            }
-            
         } catch (Exception e) {
             throw new AuraHandledException('Failed to approve refund: ' + e.getMessage());
         }
