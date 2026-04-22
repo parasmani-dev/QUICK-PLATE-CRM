@@ -44,7 +44,7 @@ We are actively participating in **GirlScript Summer of Code 2026 (GSSoC'26)**.
 
 👉 All contributor guidelines, issues, and onboarding details can be found here:
 
-🔗 **[GSSoC'26 Contribution Guide](./gssoc26/README.md)**
+🔗 **[GSSoC'26 Contribution Guide](./gssoc26/Readme.md)**
 
 > 📌 If you're a contributor, please start from the guide above before raising issues or PRs.
 
