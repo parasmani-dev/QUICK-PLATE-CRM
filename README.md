@@ -38,6 +38,18 @@
 
 ---
 
+## 🌟 GSSoC'26 Contributions
+
+We are actively participating in **GirlScript Summer of Code 2026 (GSSoC'26)**.
+
+👉 All contributor guidelines, issues, and onboarding details can be found here:
+
+🔗 **[GSSoC'26 Contribution Guide](./gssoc26/README.md)**
+
+> 📌 If you're a contributor, please start from the guide above before raising issues or PRs.
+
+---
+
 ## 🌟 Overview
 
 **QuickPlate** is a next-generation **quick commerce food delivery platform** engineered for speed, scalability, and seamless user experience. Built on a modern tech stack combining React's responsive frontend with Salesforce's enterprise-grade CRM backend, QuickPlate delivers meals in record time while maintaining robust business logic and data integrity.
