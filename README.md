@@ -40,9 +40,22 @@
 
 ## 🌟 GSSoC'26 Contributions
 
-We are actively participating in **GirlScript Summer of Code 2026 (GSSoC'26)**.
+<div align="center">
 
-👉 All contributor guidelines, issues, and onboarding details can be found here:
+
+### 🔥 GirlScript Summer of Code 2026 — Season Open 🔥
+
+![GSSoC 2026](https://img.shields.io/badge/GSSoC'26-Open%20For%20Contributions-FF6600?style=for-the-badge&logo=github&logoColor=white)
+![Season](https://img.shields.io/badge/Season-2026-FF8C00?style=for-the-badge&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge&logoColor=white)
+
+**Welcome to QuickPlate's GSSoC'26 program!** 🧡 
+
+# 👇🏽
+
+
+</div>
+
 
 🔗 **[GSSoC'26 Contribution Guide](./gssoc26/Readme.md)**
 
