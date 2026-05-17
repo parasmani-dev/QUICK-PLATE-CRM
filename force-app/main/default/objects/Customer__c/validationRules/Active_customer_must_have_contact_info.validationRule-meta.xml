@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_customer_must_have_contact_info</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  Is_Active__c = TRUE,
+  ISBLANK(Phone__c),
+  ISBLANK(Email__c)
+)</errorConditionFormula>
+    <errorMessage>Active customers must have either a Phone or Email.</errorMessage>
+</ValidationRule>

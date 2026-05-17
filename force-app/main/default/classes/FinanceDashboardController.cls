@@ -7,7 +7,7 @@ public with sharing class FinanceDashboardController {
         }
     }
 
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static DashboardDataWrapper getDashboardData(String timeFilter) {
         validatePermission();
         

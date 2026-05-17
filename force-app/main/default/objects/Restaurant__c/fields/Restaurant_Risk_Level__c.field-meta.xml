@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Restaurant_Risk_Level__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+  Is_Active__c = false,
+  &quot;INACTIVE&quot;,
+  IF(
+    Is_Temporarily_Closed__c,
+    &quot;TEMP_CLOSED&quot;,
+    &quot;ACTIVE&quot;
+  )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Restaurant_Risk_Level</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Service_Zone__c</fullName>
+    <label>Service_Zone</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Current_City__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>T. Nagar</fullName>
+                <default>false</default>
+                <label>T. Nagar</label>
+            </value>
+            <value>
+                <fullName>Anna Nagar</fullName>
+                <default>false</default>
+                <label>Anna Nagar</label>
+            </value>
+            <value>
+                <fullName>Adyar</fullName>
+                <default>false</default>
+                <label>Adyar</label>
+            </value>
+            <value>
+                <fullName>Velachery</fullName>
+                <default>false</default>
+                <label>Velachery</label>
+            </value>
+            <value>
+                <fullName>Tambaram</fullName>
+                <default>false</default>
+                <label>Tambaram</label>
+            </value>
+            <value>
+                <fullName>Porur</fullName>
+                <default>false</default>
+                <label>Porur</label>
+            </value>
+            <value>
+                <fullName>Ambattur</fullName>
+                <default>false</default>
+                <label>Ambattur</label>
+            </value>
+            <value>
+                <fullName>Mylapore</fullName>
+                <default>false</default>
+                <label>Mylapore</label>
+            </value>
+            <value>
+                <fullName>Chromepet</fullName>
+                <default>false</default>
+                <label>Chromepet</label>
+            </value>
+            <value>
+                <fullName>Perambur</fullName>
+                <default>false</default>
+                <label>Perambur</label>
+            </value>
+            <value>
+                <fullName>RS Puram</fullName>
+                <default>false</default>
+                <label>RS Puram</label>
+            </value>
+            <value>
+                <fullName>Gandhipuram</fullName>
+                <default>false</default>
+                <label>Gandhipuram</label>
+            </value>
+            <value>
+                <fullName>Saibaba Colony</fullName>
+                <default>false</default>
+                <label>Saibaba Colony</label>
+            </value>
+            <value>
+                <fullName>Peelamedu</fullName>
+                <default>false</default>
+                <label>Peelamedu</label>
+            </value>
+            <value>
+                <fullName>Singanallur</fullName>
+                <default>false</default>
+                <label>Singanallur</label>
+            </value>
+            <value>
+                <fullName>Saravanampatti</fullName>
+                <default>false</default>
+                <label>Saravanampatti</label>
+            </value>
+            <value>
+                <fullName>Ukkadam</fullName>
+                <default>false</default>
+                <label>Ukkadam</label>
+            </value>
+            <value>
+                <fullName>Ramanathapuram</fullName>
+                <default>false</default>
+                <label>Ramanathapuram</label>
+            </value>
+            <value>
+                <fullName>Town Hall</fullName>
+                <default>false</default>
+                <label>Town Hall</label>
+            </value>
+            <value>
+                <fullName>Kovaipudur</fullName>
+                <default>false</default>
+                <label>Kovaipudur</label>
+            </value>
+            <value>
+                <fullName>Thillai Nagar</fullName>
+                <default>false</default>
+                <label>Thillai Nagar</label>
+            </value>
+            <value>
+                <fullName>Cantonment</fullName>
+                <default>false</default>
+                <label>Cantonment</label>
+            </value>
+            <value>
+                <fullName>Srirangam</fullName>
+                <default>false</default>
+                <label>Srirangam</label>
+            </value>
+            <value>
+                <fullName>Woraiyur</fullName>
+                <default>false</default>
+                <label>Woraiyur</label>
+            </value>
+            <value>
+                <fullName>K.K. Nagar</fullName>
+                <default>false</default>
+                <label>K.K. Nagar</label>
+            </value>
+            <value>
+                <fullName>Tennur</fullName>
+                <default>false</default>
+                <label>Tennur</label>
+            </value>
+            <value>
+                <fullName>Karumandapam</fullName>
+                <default>false</default>
+                <label>Karumandapam</label>
+            </value>
+            <value>
+                <fullName>Golden Rock</fullName>
+                <default>false</default>
+                <label>Golden Rock</label>
+            </value>
+            <value>
+                <fullName>Kattur</fullName>
+                <default>false</default>
+                <label>Kattur</label>
+            </value>
+            <value>
+                <fullName>Chatram Bus Stand</fullName>
+                <default>false</default>
+                <label>Chatram Bus Stand</label>
+            </value>
+            <value>
+                <fullName>Thanthonimalai</fullName>
+                <default>false</default>
+                <label>Thanthonimalai</label>
+            </value>
+            <value>
+                <fullName>Pasupathipalayam</fullName>
+                <default>false</default>
+                <label>Pasupathipalayam</label>
+            </value>
+            <value>
+                <fullName>Vengamedu</fullName>
+                <default>false</default>
+                <label>Vengamedu</label>
+            </value>
+            <value>
+                <fullName>Gandhigramam</fullName>
+                <default>false</default>
+                <label>Gandhigramam</label>
+            </value>
+            <value>
+                <fullName>Jawahar Bazaar</fullName>
+                <default>false</default>
+                <label>Jawahar Bazaar</label>
+            </value>
+            <value>
+                <fullName>Sengunthapuram</fullName>
+                <default>false</default>
+                <label>Sengunthapuram</label>
+            </value>
+            <value>
+                <fullName>Puliyur</fullName>
+                <default>false</default>
+                <label>Puliyur</label>
+            </value>
+            <value>
+                <fullName>Inam Karur</fullName>
+                <default>false</default>
+                <label>Inam Karur</label>
+            </value>
+            <value>
+                <fullName>Vaiyapuri Nagar</fullName>
+                <default>false</default>
+                <label>Vaiyapuri Nagar</label>
+            </value>
+            <value>
+                <fullName>Rathinam Salai</fullName>
+                <default>false</default>
+                <label>Rathinam Salai</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Thanthonimalai</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Pasupathipalayam</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Vengamedu</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Gandhigramam</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Jawahar Bazaar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Sengunthapuram</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Puliyur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Inam Karur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Vaiyapuri Nagar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Karur</controllingFieldValue>
+            <valueName>Rathinam Salai</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>T. Nagar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>Anna Nagar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>Adyar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>Velachery</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>Tambaram</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>Porur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>Ambattur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>Mylapore</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>Chromepet</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Chennai</controllingFieldValue>
+            <valueName>Perambur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>RS Puram</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>Gandhipuram</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>Saibaba Colony</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>Peelamedu</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>Singanallur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>Saravanampatti</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>Ukkadam</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>Ramanathapuram</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>Town Hall</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Coimbatore</controllingFieldValue>
+            <valueName>Kovaipudur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>Thillai Nagar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>Cantonment</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>Srirangam</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>Woraiyur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>K.K. Nagar</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>Tennur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>Karumandapam</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>Golden Rock</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>Kattur</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Tiruchirappalli</controllingFieldValue>
+            <valueName>Chatram Bus Stand</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

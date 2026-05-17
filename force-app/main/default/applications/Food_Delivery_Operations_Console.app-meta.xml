@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#DE291C</headerColor>
+        <logo>Screenshot_20260206_at_115842AM</logo>
+        <logoVersion>1</logoVersion>
+        <shouldOverrideOrgTheme>true</shouldOverrideOrgTheme>
+    </brand>
+    <description>Food Delivery Product with Salesforce as the CRM &amp; Backend Engine React → Complete customer-facing app Salesforce → Internal system used by the business to run operations.</description>
+    <formFactors>Small</formFactors>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
+    <label>Food Delivery Operations Console</label>
+    <navType>Standard</navType>
+    <tabs>Test_Page</tabs>
+    <tabs>Restaurant_Op_Team</tabs>
+    <tabs>Finance_Team</tabs>
+    <uiType>Lightning</uiType>
+    <utilityBar>Food_Delivery_Operations_Console_UtilityBar</utilityBar>
+</CustomApplication>

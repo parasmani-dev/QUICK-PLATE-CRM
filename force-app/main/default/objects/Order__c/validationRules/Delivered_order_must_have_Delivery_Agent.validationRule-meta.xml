@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Delivered_order_must_have_Delivery_Agent</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  ISPICKVAL(Order_Status__c, &quot;DELIVERED&quot;),
+  ISBLANK(Delivery_Agent__c)
+)</errorConditionFormula>
+    <errorDisplayField>Delivery_Agent__c</errorDisplayField>
+    <errorMessage>Delivered orders must have a Delivery Agent assigned</errorMessage>
+</ValidationRule>

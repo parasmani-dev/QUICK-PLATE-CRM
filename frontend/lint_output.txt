@@ -1,0 +1,60 @@
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Checkout/Checkout.jsx
+   2:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                             no-unused-vars
+   4:8   error    'toast' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                              no-unused-vars
+  29:11  error    'cart' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                      no-unused-vars
+  78:6   warning  React Hook useEffect has a missing dependency: 'storedUser.customerId'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/CustomerWallet/CustomerWallet.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Discover/Discover.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Features/Features.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Home/Home.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Landing/Landing.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Onboarding/Onboarding.jsx
+   2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u             no-unused-vars
+  27:11  error  'lightTap' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  61:14  error  'err' is defined but never used                                                           no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/OnboardingDetails/OnboardingDetails.jsx
+  51:18  error  'error' is defined but never used  no-unused-vars
+  58:8   error  'err' is defined but never used    no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/PaymentSuccess/PaymentSuccess.jsx
+  4:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Profile/Profile.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/RaiseRefund/RaiseRefund.jsx
+  36:21  error  'mediumTap' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Restaurant/Restaurant.jsx
+    1:28  error  'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+    2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  147:29  error  'sectionIdx' is defined but never used                                            no-unused-vars
+  161:41  error  'itemIdx' is defined but never used                                               no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Support/Support.jsx
+  53:21  error  'mediumTap' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/pages/Tracking/Tracking.jsx
+  193:6  warning  React Hook useEffect has a missing dependency: 'order'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/varunshiyam/Downloads/Projects/QUICK PLATE - CRM/src/services/api.js
+  58:19  error  '_id' is defined but never used           no-unused-vars
+  64:18  error  '_orderData' is defined but never used    no-unused-vars
+  70:19  error  '_id' is defined but never used           no-unused-vars
+  76:17  error  '_credentials' is defined but never used  no-unused-vars
+
+✖ 27 problems (25 errors, 2 warnings)
+

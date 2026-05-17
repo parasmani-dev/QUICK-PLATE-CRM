@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Refund_amount_cannot_exceed_order_total</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  Refund_Requested__c = TRUE,
+  Refund_Amount__c &gt; Order_Total__c
+)</errorConditionFormula>
+    <errorDisplayField>Refund_Amount__c</errorDisplayField>
+    <errorMessage>Refund amount cannot exceed the order total.</errorMessage>
+</ValidationRule>

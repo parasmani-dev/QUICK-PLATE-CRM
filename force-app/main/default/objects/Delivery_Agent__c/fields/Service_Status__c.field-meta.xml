@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Service_Status__c</fullName>
+    <label>Service_Status</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ONLINE</fullName>
+                <default>false</default>
+                <label>ONLINE</label>
+            </value>
+            <value>
+                <fullName>OFFLINE</fullName>
+                <default>false</default>
+                <label>OFFLINE</label>
+            </value>
+            <value>
+                <fullName>ON_BREAK</fullName>
+                <default>false</default>
+                <label>ON_BREAK</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

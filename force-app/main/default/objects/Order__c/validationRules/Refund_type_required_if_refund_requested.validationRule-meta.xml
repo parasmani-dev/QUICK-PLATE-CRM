@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Refund_type_required_if_refund_requested</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  Refund_Requested__c = TRUE,
+   ISPICKVAL( Refund_Type__c , &quot;&quot;) 
+)</errorConditionFormula>
+    <errorDisplayField>Refund_Type__c</errorDisplayField>
+    <errorMessage>Refund Type must be specified when a refund is requested.</errorMessage>
+</ValidationRule>

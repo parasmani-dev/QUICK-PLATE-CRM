@@ -28,17 +28,20 @@
             <template if:true={hasData}>
                 <!-- SECTION 1: TOP KPI CARDS -->
                 <div class="kpi-grid">
-                    <!-- Revenue Card -->
+                    <!-- Company Balance Card -->
                     <div class="kpi-card slide-up-1">
                         <div class="kpi-icon icon-purple"><lightning-icon icon-name="utility:moneybag" size="small"></lightning-icon></div>
-                        <h3 class="kpi-title">Total Revenue</h3>
-                        <div class="kpi-values">
+                        <h3 class="kpi-title">Company Balance</h3>
+                        <div class="kpi-values kpi-split" style="align-items: flex-end;">
                             <span class="kpi-primary">
-                                <lightning-formatted-number value={data.grossRevenue} format-style="currency" currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number> <span class="kpi-label">(Gross)</span>
+                                <lightning-formatted-number value={data.netRevenue} format-style="currency" currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number>
                             </span>
-                            <span class="kpi-secondary">
-                                <lightning-formatted-number value={data.netRevenue} format-style="currency" currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number> <span class="kpi-label">(Net)</span>
-                            </span>
+                            <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                                <span class="kpi-label" style="text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px;">Gross</span>
+                                <span class="kpi-primary">
+                                    <lightning-formatted-number value={data.grossRevenue} format-style="currency" currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -116,9 +119,9 @@
                                 <div key={trend.day} class="trend-bar-row">
                                     <span class="trend-day">{trend.day}</span>
                                     <div class="trend-bar-bg">
-                                        <div class="rev-bar" style={trend.revStyle}>
+                                        <div class="rev-bar" data-style={trend.revStyle}>
                                             $<lightning-formatted-number value={trend.revenue} maximum-fraction-digits="0"></lightning-formatted-number>
-                                            <div class="ref-bar" style={trend.refStyle} title="Refunds"></div>
+                                            <div class="ref-bar" data-style={trend.refStyle} title="Refunds"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -135,21 +138,21 @@
                             <div class="status-row">
                                 <div class="status-label">SUCCESS</div>
                                 <div class="status-rail">
-                                    <div class="status-fill fill-success" style={data.successRailStyle}></div>
+                                    <div class="status-fill fill-success" data-style={data.successRailStyle}></div>
                                 </div>
                                 <div class="status-val"><lightning-formatted-number value={data.successRate} maximum-fraction-digits="1"></lightning-formatted-number>%</div>
                             </div>
                             <div class="status-row">
                                 <div class="status-label">FAILED</div>
                                 <div class="status-rail">
-                                    <div class="status-fill fill-failed" style={data.failedRailStyle}></div>
+                                    <div class="status-fill fill-failed" data-style={data.failedRailStyle}></div>
                                 </div>
                                 <div class="status-val"><lightning-formatted-number value={data.failedRate} maximum-fraction-digits="1"></lightning-formatted-number>%</div>
                             </div>
                             <div class="status-row">
                                 <div class="status-label">PENDING</div>
                                 <div class="status-rail">
-                                    <div class="status-fill fill-pending" style={data.pendingRailStyle}></div>
+                                    <div class="status-fill fill-pending" data-style={data.pendingRailStyle}></div>
                                 </div>
                                 <div class="status-val"><lightning-formatted-number value={data.pendingRate} maximum-fraction-digits="1"></lightning-formatted-number>%</div>
                             </div>

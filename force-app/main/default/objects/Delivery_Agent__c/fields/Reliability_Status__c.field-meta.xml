@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reliability_Status__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+  Is_Active__c = false,
+  &quot;INACTIVE&quot;,
+  IF(
+    Is_Available__c = false,
+    &quot;BUSY&quot;,
+    &quot;AVAILABLE&quot;
+  )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Reliability_Status</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

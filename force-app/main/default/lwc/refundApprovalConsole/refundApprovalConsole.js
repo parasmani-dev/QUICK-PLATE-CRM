@@ -110,6 +110,13 @@ export default class RefundApprovalConsole extends LightningElement {
         this.refundAmount = event.target.value;
     }
 
+    get isOverLimit() {
+        if (!this.refundAmount || !this.selectedTicketDetails) return false;
+        const amount = parseFloat(this.refundAmount) || 0;
+        const max = parseFloat(this.selectedTicketDetails.OrderTotal) || 0;
+        return amount > max;
+    }
+
     /**
      * Requirement: trigger backend financial operation for Approval
      */

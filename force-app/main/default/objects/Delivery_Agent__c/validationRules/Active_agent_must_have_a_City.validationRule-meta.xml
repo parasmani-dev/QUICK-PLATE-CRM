@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_agent_must_have_a_City</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  Is_Active__c = TRUE,
+ISPICKVAL( Current_City__c , &apos;&apos;) 
+)</errorConditionFormula>
+    <errorDisplayField>Is_Active__c</errorDisplayField>
+    <errorMessage>Active agents must have a current city assigned.</errorMessage>
+</ValidationRule>

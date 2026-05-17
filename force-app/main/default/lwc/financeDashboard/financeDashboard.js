@@ -78,6 +78,17 @@ export default class FinanceDashboard extends NavigationMixin(LightningElement) 
         return this.data != null;
     }
 
+    renderedCallback() {
+        if (this.hasData) {
+            const dynamicBars = this.template.querySelectorAll('[data-style]');
+            dynamicBars.forEach(bar => {
+                if (bar.dataset.style) {
+                    bar.style.cssText = bar.dataset.style;
+                }
+            });
+        }
+    }
+
     handleViewRecord(event) {
         const recordId = event.currentTarget.dataset.id;
         if (recordId) {

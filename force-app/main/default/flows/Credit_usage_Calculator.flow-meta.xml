@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>If_Credits_Used</name>
+        <label>If Credits Used</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Yes_Used</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Credits_Used__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <numberValue>0.0</numberValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Updating_Credit_Balance</targetReference>
+            </connector>
+            <label>Yes Used</label>
+        </rules>
+    </decisions>
+    <description>Calculates the Credits Used by the User and Update the balance in the Customer credit Object</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>The Balance amount after The credts are used</description>
+        <name>Balance_Amount</name>
+        <dataType>Currency</dataType>
+        <expression>{!Getting_Credits_Details.Available_Amount__c} - {!$Record.Credits_Used__c}</expression>
+        <scale>2</scale>
+    </formulas>
+    <interviewLabel>Credit usage Calculator {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Credit usage Calculator</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Getting_Credits_Details</name>
+        <label>Getting Credits Details</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>If_Credits_Used</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Customer__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Customer__r.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Customer_Credit__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Updating_Credit_Balance</name>
+        <label>Updating Credit Balance</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Customer__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Customer__r.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Available_Amount__c</field>
+            <value>
+                <elementReference>Balance_Amount</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Customer_Credit__c</object>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Getting_Credits_Details</targetReference>
+        </connector>
+        <object>Order__c</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

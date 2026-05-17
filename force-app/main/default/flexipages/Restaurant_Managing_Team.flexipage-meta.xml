@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>restaurantOpBanner</componentName>
+                <identifier>c_restaurantOpBanner</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>restaurantManagerDashboard</componentName>
+                <identifier>c_restaurantManagerDashboard</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>restaurantOnboardingTracker</componentName>
+                <identifier>c_restaurantOnboardingTracker</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>region1</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <name>region2</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <name>region3</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <name>region4</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <masterLabel>Restaurant Managing Team</masterLabel>
+    <template>
+        <name>flexipage:appHomeTemplateHeaderThreeColumns</name>
+    </template>
+    <type>AppPage</type>
+</FlexiPage>

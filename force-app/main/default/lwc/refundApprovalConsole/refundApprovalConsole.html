@@ -143,6 +143,12 @@
                                                 step="0.01" 
                                                 onchange={handleAmountChange}>
                                             </lightning-input>
+                                            <template if:true={isOverLimit}>
+                                                <div class="slds-text-color_error slds-m-top_xx-small" style="font-size: 0.8rem; font-weight: 600;">
+                                                    <lightning-icon icon-name="utility:warning" size="xx-small" variant="error" class="slds-m-right_xx-small"></lightning-icon>
+                                                    Amount exceeds Max available!
+                                                </div>
+                                            </template>
                                         </div>
                                         <div class="slds-col slds-size_1-of-2 slds-text-align_right slds-text-color_weak">
                                             <em>Max available: <lightning-formatted-number value={selectedTicketDetails.OrderTotal} format-style="currency" currency-code="USD"></lightning-formatted-number></em>

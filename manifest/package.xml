@@ -1,50 +1,98 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
 
-    <!-- Apex Classes -->
+    <!-- ===================================================== -->
+    <!-- APEX CLASSES -->
+    <!-- ===================================================== -->
     <types>
+
+        <!-- Core Controllers -->
         <members>CustomerProfileController</members>
         <members>OrderController</members>
+        <members>RestaurantController</members>
+        <members>OrderStatusController</members>
+        <members>CustomerOrdersController</members>
         <members>SupportTicketController</members>
+        <members>SupportTicketStatusController</members>
+        <members>CustomerWalletController</members>
+        <members>WalletAddFundsController</members>
+
+        <!-- Operational Engines -->
+        <members>DeliveryAssignmentEngine</members>
+        <members>DeliveryCompletionEngine</members>
         <members>RefundRequestEngine</members>
-        <members>OperationsDashboardController</members>
+        <members>OrderLifecycleController</members>
+
+        <!-- Approval + Operations -->
+        <members>RestaurantApprovalController</members>
         <members>RefundApprovalController</members>
+        <members>OperationsDashboardController</members>
+        <members>OperationsCommandCenterController</members>
+        <members>RestaurantManagerController</members>
+        <members>RestaurantOnboardingTrackerCtrl</members>
+        <members>FinanceDashboardController</members>
+
+        <!-- Payment Integration -->
+        <members>StripeCheckoutController</members>
+        <members>StripeWebhookController</members>
+
+        <!-- Firebase -->
+        <members>FirebaseAuthController</members>
+        <members>FirebaseAuthUtil</members>
+
         <name>ApexClass</name>
     </types>
 
-    <!-- LWC Components -->
+    <!-- ===================================================== -->
+    <!-- APEX TRIGGERS -->
+    <!-- ===================================================== -->
     <types>
-        <members>liveOrdersMonitor</members>
-        <members>operationsDashboard</members>
-        <members>refundApprovalConsole</members>
+        <members>*</members>
+        <name>ApexTrigger</name>
+    </types>
+
+    <!-- ===================================================== -->
+    <!-- LIGHTNING WEB COMPONENTS -->
+    <!-- ===================================================== -->
+    <types>
+        <members>*</members>
         <name>LightningComponentBundle</name>
     </types>
 
-    <!-- Flows -->
+    <!-- ===================================================== -->
+    <!-- FLOWS -->
+    <!-- ===================================================== -->
     <types>
-        <members>ORDER_CREATION_ENGINE</members>
+        <members>*</members>
         <name>Flow</name>
     </types>
 
-    <!-- Approval Processes -->
-    <types>
-        <members>Support_Ticket__c.*</members>
-        <members>Restaurant__c.*</members>
-        <name>ApprovalProcess</name>
-    </types>
-
-    <!-- Custom Objects -->
+    <!-- ===================================================== -->
+    <!-- CUSTOM OBJECTS -->
+    <!-- ===================================================== -->
     <types>
         <members>Customer__c</members>
+        <members>Customer_Credit__c</members>
         <members>Order__c</members>
         <members>Restaurant__c</members>
+        <members>Restaurant_Owners__c</members>
         <members>Delivery_Agent__c</members>
         <members>Payment_Transaction__c</members>
         <members>Support_Ticket__c</members>
         <name>CustomObject</name>
     </types>
 
-    <!-- Permission Sets -->
+    <!-- ===================================================== -->
+    <!-- CUSTOM FIELDS -->
+    <!-- ===================================================== -->
+    <types>
+        <members>*</members>
+        <name>CustomField</name>
+    </types>
+
+    <!-- ===================================================== -->
+    <!-- PERMISSION SETS -->
+    <!-- ===================================================== -->
     <types>
         <members>QuickPlate_Delivery_Ops</members>
         <members>QuickPlate_Finance_Team</members>
@@ -54,26 +102,69 @@
         <name>PermissionSet</name>
     </types>
 
-    <!-- Queues -->
+    <!-- ===================================================== -->
+    <!-- STATIC RESOURCES -->
+    <!-- ===================================================== -->
     <types>
-        <members>Customer_Service_Queue</members>
-        <members>Operations_Approval_Queue</members>
-        <name>Group</name>
-    </types>
-
-    <!-- Triggers (if any later) -->
-    <types>
-        <members>*</members>
-        <name>ApexTrigger</name>
-    </types>
-
-    <!-- Static Resources -->
-    <types>
-        <members>*</members>
+        <members>Finance_Banner</members>
+        <members>RESTAURANT_OP</members>
+        <members>OP_Banner</members>
+        <members>Restaurant_Icon</members>
+        <members>SiteSamples</members>
         <name>StaticResource</name>
     </types>
 
-    <!-- API Version -->
+    <!-- ===================================================== -->
+    <!-- CUSTOM TABS -->
+    <!-- ===================================================== -->
+    <types>
+        <members>*</members>
+        <name>CustomTab</name>
+    </types>
+
+    <!-- ===================================================== -->
+    <!-- CUSTOM APPLICATIONS -->
+    <!-- ===================================================== -->
+    <types>
+        <members>*</members>
+        <name>CustomApplication</name>
+    </types>
+
+    <!-- ===================================================== -->
+    <!-- FLEXIPAGES -->
+    <!-- ===================================================== -->
+    <types>
+        <members>*</members>
+        <name>FlexiPage</name>
+    </types>
+
+    <!-- ===================================================== -->
+    <!-- RECORD TYPES -->
+    <!-- ===================================================== -->
+    <types>
+        <members>*</members>
+        <name>RecordType</name>
+    </types>
+
+    <!-- ===================================================== -->
+    <!-- VALIDATION RULES -->
+    <!-- ===================================================== -->
+    <types>
+        <members>*</members>
+        <name>ValidationRule</name>
+    </types>
+
+    <!-- ===================================================== -->
+    <!-- CUSTOM LABELS -->
+    <!-- ===================================================== -->
+    <types>
+        <members>*</members>
+        <name>CustomLabel</name>
+    </types>
+
+    <!-- ===================================================== -->
+    <!-- API VERSION -->
+    <!-- ===================================================== -->
     <version>66.0</version>
 
 </Package>

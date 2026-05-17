@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Inactive_agent_cannot_be_available</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  Is_Available__c = TRUE,
+  Is_Active__c = FALSE
+)</errorConditionFormula>
+    <errorDisplayField>Is_Available__c</errorDisplayField>
+    <errorMessage>Inactive agents cannot be marked as available.</errorMessage>
+</ValidationRule>

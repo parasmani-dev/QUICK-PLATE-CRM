@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "path": "/Users/varunshiyam/Desktop/QUICKPLATE CONSOLE/CONSOLE_LWC"
+    }
+  ],
+  "settings": {
+    "eslint.workingDirectories": [
+      "/Users/varunshiyam/Desktop/QUICKPLATE CONSOLE/CONSOLE_LWC"
+    ],
+    "eslint.validate": [
+      "javascript",
+      "typescript"
+    ],
+    "eslint.options": {
+      "overrideConfigFile": "/Users/varunshiyam/Desktop/QUICKPLATE CONSOLE/CONSOLE_LWC/.eslintrc.json"
+    }
+  }
+}

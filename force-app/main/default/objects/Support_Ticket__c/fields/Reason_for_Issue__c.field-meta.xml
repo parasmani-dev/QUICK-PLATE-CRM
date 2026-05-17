@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reason_for_Issue__c</fullName>
+    <label>Reason for Issue</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Issue_Type__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Order Item Missing</fullName>
+                <default>false</default>
+                <label>Order Item Missing</label>
+            </value>
+            <value>
+                <fullName>Quality Issue</fullName>
+                <default>false</default>
+                <label>Quality Issue</label>
+            </value>
+            <value>
+                <fullName>Quantity Issue</fullName>
+                <default>false</default>
+                <label>Quantity Issue</label>
+            </value>
+            <value>
+                <fullName>Package Damaged</fullName>
+                <default>false</default>
+                <label>Package Damaged</label>
+            </value>
+            <value>
+                <fullName>Late Delivery</fullName>
+                <default>false</default>
+                <label>Late Delivery</label>
+            </value>
+            <value>
+                <fullName>Order Not Placed</fullName>
+                <default>false</default>
+                <label>Order Not Placed</label>
+            </value>
+            <value>
+                <fullName>No Delivery Agent Assigned</fullName>
+                <default>false</default>
+                <label>No Delivery Agent Assigned</label>
+            </value>
+            <value>
+                <fullName>Mistakenly Ordered</fullName>
+                <default>false</default>
+                <label>Mistakenly Ordered</label>
+            </value>
+            <value>
+                <fullName>Missing Items</fullName>
+                <default>false</default>
+                <label>Missing Items</label>
+            </value>
+            <value>
+                <fullName>Wrong Order</fullName>
+                <default>false</default>
+                <label>Wrong Order</label>
+            </value>
+            <value>
+                <fullName>Bugs in Order Page</fullName>
+                <default>false</default>
+                <label>Bugs in Order Page</label>
+            </value>
+            <value>
+                <fullName>Double Charged</fullName>
+                <default>false</default>
+                <label>Double Charged</label>
+            </value>
+            <value>
+                <fullName>Refund Not Received</fullName>
+                <default>false</default>
+                <label>Refund Not Received</label>
+            </value>
+            <value>
+                <fullName>Payment Failed But Amount Deducted</fullName>
+                <default>false</default>
+                <label>Payment Failed But Amount Deducted</label>
+            </value>
+            <value>
+                <fullName>Over Than MRP Price</fullName>
+                <default>false</default>
+                <label>Over Than MRP Price</label>
+            </value>
+            <value>
+                <fullName>Payment Failed</fullName>
+                <default>false</default>
+                <label>Payment Failed</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Payment Issue</controllingFieldValue>
+            <valueName>Double Charged</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Payment Issue</controllingFieldValue>
+            <valueName>Refund Not Received</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Payment Issue</controllingFieldValue>
+            <valueName>Payment Failed But Amount Deducted</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Payment Issue</controllingFieldValue>
+            <valueName>Over Than MRP Price</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Payment Issue</controllingFieldValue>
+            <valueName>Payment Failed</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Refund Request</controllingFieldValue>
+            <valueName>Order Item Missing</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Refund Request</controllingFieldValue>
+            <valueName>Quality Issue</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Refund Request</controllingFieldValue>
+            <valueName>Quantity Issue</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Refund Request</controllingFieldValue>
+            <valueName>Package Damaged</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Refund Request</controllingFieldValue>
+            <controllingFieldValue>Order Issue</controllingFieldValue>
+            <valueName>Late Delivery</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Order Issue</controllingFieldValue>
+            <valueName>Order Not Placed</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Order Issue</controllingFieldValue>
+            <valueName>No Delivery Agent Assigned</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Order Issue</controllingFieldValue>
+            <valueName>Mistakenly Ordered</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Order Issue</controllingFieldValue>
+            <valueName>Missing Items</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Order Issue</controllingFieldValue>
+            <valueName>Wrong Order</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Order Issue</controllingFieldValue>
+            <valueName>Bugs in Order Page</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

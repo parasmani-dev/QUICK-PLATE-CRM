@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Closed_orders_must_have_Closed_Date</fullName>
+    <active>false</active>
+    <errorConditionFormula>AND(
+  OR(
+    ISPICKVAL(Order_Status__c, &quot;DELIVERED&quot;),
+    ISPICKVAL(Order_Status__c, &quot;CANCELLED&quot;),
+    ISPICKVAL(Order_Status__c, &quot;REFUNDED&quot;)
+  ),
+  ISBLANK(Order_Closed_At__c)
+)</errorConditionFormula>
+    <errorDisplayField>Order_Closed_At__c</errorDisplayField>
+    <errorMessage>Closed orders must have a Closed Date</errorMessage>
+</ValidationRule>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Closed_ticket_must_have_Resolution_Type</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  ISPICKVAL(Ticket_Status__c, &quot;CLOSED&quot;),
+ ISPICKVAL(Resolution_Type__c, &apos;&apos;) 
+)</errorConditionFormula>
+    <errorDisplayField>Resolution_Type__c</errorDisplayField>
+    <errorMessage>Resolution Type is required before closing a ticket.</errorMessage>
+</ValidationRule>
