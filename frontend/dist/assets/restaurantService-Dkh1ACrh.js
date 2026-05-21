@@ -1,1 +1,0 @@
-const e="https://varun-quick-plate-dev-ed.develop.my.salesforce-sites.com",s=async()=>{try{const t=await fetch(`${e}/services/apexrest/restaurant/list`);if(!t.ok)throw new Error(`HTTP error! status: ${t.status}`);return await t.json()}catch(t){throw console.error("Failed to fetch restaurants:",t),t}};export{s as f};
